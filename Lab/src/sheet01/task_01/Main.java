@@ -1,4 +1,4 @@
-package task_01;
+package sheet01.task_01;
 
 import java.util.Scanner;
 
