@@ -11,18 +11,25 @@ public class Main {
 
 			int a;
 			int b;
-
-			for (int coutner = scanner.nextInt(); coutner > 0; coutner--) {
+			int coutner = scanner.nextInt();
+			//check for invalid input
+			if (counter > 100)
+				counter = 100;
+			for (counter ; coutner > 0; coutner--) {
 
 				a = scanner.nextInt();
 				b = scanner.nextInt();
-
-				if (a < b) {
-					System.out.println("less than");
-				} else if (a > b) {
-					System.out.println("greater than");
-				} else {
-					System.out.println("equal to");
+			//check for invalid input 
+				if ( ( a< -1000 || a > 1000) || ( b < -1000 || b > 1000))
+					System.out.println("invalid input");
+				else {
+					if (a < b) {
+						System.out.println("less than");
+					} else if (a > b) {
+						System.out.println("greater than");
+					} else {
+						System.out.println("equal to");
+					}
 				}
 			}
 		}
