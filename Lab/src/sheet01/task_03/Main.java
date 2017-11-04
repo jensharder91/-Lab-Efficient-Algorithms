@@ -27,6 +27,9 @@ public class Main {
 
 					// simple cases, because assume smaller < 5
 					switch (smaller) {
+					case 0:
+						System.out.println(0);
+						break;
 					case 1:
 						System.out.println(1);
 						break;
@@ -43,7 +46,7 @@ public class Main {
 							System.out.println(3);
 						break;
 					case 4:
-						if (bigger < 5)
+						if (bigger < 4)
 							System.out.println(3);
 						else
 							System.out.println(4);
