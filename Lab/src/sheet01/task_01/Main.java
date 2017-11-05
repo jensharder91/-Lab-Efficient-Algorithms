@@ -11,11 +11,11 @@ public class Main {
 
 			int a;
 			int b;
-			int coutner = scanner.nextInt();
+			int counter = scanner.nextInt();
 			//check for invalid input
 			if (counter > 100)
 				counter = 100;
-			for (counter ; coutner > 0; coutner--) {
+			for (int c = counter; c> 0; c--) {
 
 				a = scanner.nextInt();
 				b = scanner.nextInt();

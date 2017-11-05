@@ -1,7 +1,6 @@
 package sheet01.task_02;
 
 import java.util.Scanner;
-import java.util.Arrays;
 
 public class Main {
 	public static void main(String[] args) {
@@ -18,10 +17,10 @@ public class Main {
 				char[] permutation = word.toCharArray();        //Convert to array of chars 
 				java.util.Arrays.sort(permutation);  
 				System.out.println(permutation);
-				permute (permutation);			
+				permute (permutation, permutation.length);			
 				}
-			}
-			System.out.println("another test");
+		}
+		scanner.close();
 	}
 	
 	static void permute (char [] text, int n) {
@@ -30,18 +29,18 @@ public class Main {
 		System.out.println(text); 
 		}
 		else{
-			for (int k=n; k>=1; k=k-1){
-				if (text[k] == text[n])  // don't print equal words twice
+			for (int k=n-1; k>=0; k--){
+				if (text[k] == text[n-1])  // don't print equal words twice
 					continue;
-				// swap text[k], text[n]
+				// swap text[k], text[n-1]
 				temp=text[k];
-				text[k]=text[n];
-				text[n]=temp;
+				text[k]=text[n-1];
+				text[n-1]=temp;
 				permute (text, n-1); 
-				// swap text[k], text[n]
+				// swap text[k], text[n-1]
 				temp=text[k];
-				text[k]=text[n];
-				text[n]=temp;
+				text[k]=text[n-1];
+				text[n-1]=temp;
 			}
 		} 
 	}
