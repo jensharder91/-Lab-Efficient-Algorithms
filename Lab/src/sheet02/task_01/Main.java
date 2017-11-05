@@ -11,7 +11,7 @@ public class Main {
 
 			int n;
 			int k;
-      long sum;
+			long sum;
       
 			while (scanner.hasNextInt()) {
         sum = 0;
@@ -21,7 +21,7 @@ public class Main {
         //check for valid input
         if ( (n > 0 && n < 146) && ( k >0 && k < 16)) {
         
-				  for ( int j=1;  j > n; j++){
+				  for ( int j=1;  j <= n; j++){
            sum += j* (int)Math.pow(k, j);
           }
 				  System.out.println(sum);
