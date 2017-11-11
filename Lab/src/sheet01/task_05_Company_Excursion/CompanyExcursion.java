@@ -1,8 +1,8 @@
-package sheet01.task_05;
+package sheet01.task_05_Company_Excursion;
 
 import java.util.Scanner;
 
-public class Main {
+public class CompanyExcursion {
 	public static void main(String[] args) {
 
 		Scanner scanner = new Scanner(System.in);
@@ -21,7 +21,11 @@ public class Main {
 		int cost;
 
 		// TODO break loop at some point? condition?
-		while (scanner.hasNextInt()) {
+		while (true) {
+			
+			if(!scanner.hasNext()) {
+				break;
+			}
 
 			// reset
 			minimumCost = Integer.MAX_VALUE;
