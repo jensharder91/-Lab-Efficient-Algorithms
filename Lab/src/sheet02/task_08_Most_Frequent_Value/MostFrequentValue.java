@@ -48,9 +48,7 @@ public class MostFrequentValue {
 		ArrayList<TreeObject> curLine = treeObjects;
 		// generate tree
 		while (curLine.size() > 1) {
-			System.out.println("while loop");
 			for (int i = 0; i < curLine.size(); i += 2) {
-				System.out.println("inner");
 				TreeObject first = curLine.get(i);
 				TreeObject second;
 				if (i + 1 >= curLine.size()) {
@@ -66,19 +64,11 @@ public class MostFrequentValue {
 			nextLine = new ArrayList<>();
 		}
 		root = curLine.get(0);
-		System.out.println(root.drawTree(1));
 
 		// all queries
 		for (int i = 0; i < q; i++) {
 			int from = scanner.nextInt();
 			int to = scanner.nextInt();
-
-			System.out.println("##########");
-			System.out.println(getLeftBoundary(root, from).drawTree(1));
-			System.out.println(getRightBoundary(root, to).drawTree(1));
-
-			System.out.println(getInnerMaxLeft(root, from, to, 0));
-			System.out.println(getInnerMaxRight(root, from, to, 0));
 
 			int maxInner = Math.max(getInnerMaxLeft(root, from, to, 0), getInnerMaxRight(root, from, to, 0));
 
@@ -87,10 +77,6 @@ public class MostFrequentValue {
 
 			int maxLeftBoundary = leftBoundary.getIndexTo() + 1 - from;
 			int maxRightBoundary = to + 1 - rightBoundary.getIndexFrom();
-
-			System.out.println("maxInner: " + maxInner);
-			System.out.println("maxLeftBoundary: " + maxLeftBoundary);
-			System.out.println("maxRightBoundary: " + maxRightBoundary);
 			
 			//RESULT
 			int maxBoundary = Math.max(maxLeftBoundary, maxRightBoundary);

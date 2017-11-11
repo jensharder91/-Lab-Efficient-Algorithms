@@ -14,7 +14,9 @@ public class ContestScores {
 		Scanner scanner = new Scanner(System.in);
 
 		while (true) {
-			
+			if(!scanner.hasNext()) {
+				break;
+			}
 			String nextline = scanner.nextLine();
 			if(nextline.equals("")) {
 				break;
