@@ -16,7 +16,7 @@ public class Main {
 			else {
 				char[] permutation = word.toCharArray();        //Convert to array of chars 
 				java.util.Arrays.sort(permutation);  
-				System.out.println(permutation);
+			//	System.out.println(permutation);
 				permute (permutation, permutation.length);			
 				}
 		}
@@ -25,23 +25,25 @@ public class Main {
 	
 	static void permute (char [] text, int n) {
 		char temp;
-		if (n == 1){
+		if (n <= 1 ){
 		System.out.println(text); 
 		}
 		else{
-			for (int k=n-1; k>=0; k--){
-				if (text[k] == text[n-1])  // don't print equal words twice
-					continue;
-				// swap text[k], text[n-1]
-				temp=text[k];
-				text[k]=text[n-1];
-				text[n-1]=temp;
-				permute (text, n-1); 
-				// swap text[k], text[n-1]
-				temp=text[k];
-				text[k]=text[n-1];
-				text[n-1]=temp;
+			for (int k = 0; k < n; k++){
+				
+				if (text[k] != text[n-1]) { // don't print equal words twice		
+					// swap text[k], text[n-1]
+					temp=text[k];
+					text[k]=text[n-1];
+					text[n-1]=temp;
+					permute (text, n-1); 
+					// swap text[k], text[n-1]
+					temp=text[k];
+					text[k]=text[n-1];
+					text[n-1]=temp;
+				}
 			}
+			permute (text, n-1);
 		} 
 	}
 }
