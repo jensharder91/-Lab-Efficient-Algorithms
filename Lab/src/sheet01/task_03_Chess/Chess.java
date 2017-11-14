@@ -1,8 +1,8 @@
-package sheet01.task_03;
+package sheet01.task_03_Chess;
 
 import java.util.Scanner;
 
-public class Main {
+public class Chess {
 	public static void main(String[] args) {
 
 		Scanner scanner = new Scanner(System.in);

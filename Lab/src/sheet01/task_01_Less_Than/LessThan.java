@@ -1,8 +1,8 @@
-package sheet01.task_01;
+package sheet01.task_01_Less_Than;
 
 import java.util.Scanner;
 
-public class Main {
+public class LessThan {
 	public static void main(String[] args) {
 
 		Scanner scanner = new Scanner(System.in);

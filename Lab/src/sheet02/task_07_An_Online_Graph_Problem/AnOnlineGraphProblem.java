@@ -7,10 +7,13 @@ import java.util.Scanner;
 
 public class AnOnlineGraphProblem {
 
-	private static ArrayList<Integer>[] connections;
 	private static int counterPositive;
 	private static int counterNegative;
 	private static int numberVertices;
+
+	// union-find struktur
+	private static int[] repr;
+	private static ArrayList<Integer>[] items;
 
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
@@ -32,32 +35,29 @@ public class AnOnlineGraphProblem {
 			// meatadata for test case
 			numberVertices = scanner.nextInt();
 			numberEvents = scanner.nextInt();
-			connections = new ArrayList[numberVertices];
-			// init connections
-			for (int n = 0; n < numberVertices; n++) {
-				connections[n] = new ArrayList<>();
-			}
+
+			initUnionFind(numberVertices);
 
 			// loop for every event
 			for (int j = 0; j < numberEvents; j++) {
 
 				// event data
 				letter = scanner.next();
-				eventVertex_1 = scanner.nextInt();
-				eventVertex_2 = scanner.nextInt();
+				eventVertex_1 = scanner.nextInt() - 1;
+				eventVertex_2 = scanner.nextInt() - 1;
 
 				// distinguish event
 				if (letter.equals("q")) {
 					// if query is successful -> increase positive counter, otherwise increase
 					// negative counter
-					if (query(eventVertex_1 - 1, eventVertex_2 - 1)) {
+					if (repr[eventVertex_1] == repr[eventVertex_2]) {
 						counterPositive++;
 					} else {
 						counterNegative++;
 					}
 				} else if (letter.equals("n")) {
 					// insert new edge
-					insert(eventVertex_1 - 1, eventVertex_2 - 1);
+					union(eventVertex_1, eventVertex_2);
 				}
 			}
 			System.out.println(counterPositive + " " + counterNegative);
@@ -65,53 +65,37 @@ public class AnOnlineGraphProblem {
 		scanner.close();
 	}
 
-	// insert the edge in both vertices
-	private static void insert(int eventVertex_1, int eventVertex_2) {
-		ArrayList<Integer> list_1 = connections[eventVertex_1];
-		list_1.add(Integer.valueOf(eventVertex_2));
-		connections[eventVertex_1] = list_1;
-
-		ArrayList<Integer> list_2 = connections[eventVertex_2];
-		list_2.add(Integer.valueOf(eventVertex_1));
-		connections[eventVertex_2] = list_2;
+	@SuppressWarnings("unchecked")
+	private static void initUnionFind(int numberOfVertices) {
+		// union-find
+		items = new ArrayList[numberOfVertices];
+		repr = new int[numberVertices];
+		for (int n = 0; n < numberVertices; n++) {
+			items[n] = new ArrayList<>();
+			items[n].add(n);
+			repr[n] = n;
+		}
 	}
 
-	// BFS to check if a connection exists
-	private static boolean query(int eventVertex_1, int eventVertex_2) {
-
-		// same vertex
-		if (eventVertex_1 == eventVertex_2) {
-			return true;
+	private static void union(int x, int y) {
+		int i = repr[x];
+		int j = repr[y];
+		if (i == j) {
+			return;
 		}
-
-		Queue<Integer> queue = new LinkedList<>();
-		boolean[] visited = new boolean[numberVertices];
-		visited[eventVertex_1] = true;
-		connections[eventVertex_1].forEach(myInt -> {
-			if (!visited[myInt]) {
-				queue.add(myInt);
+		if (items[i].size() > items[j].size()) {
+			for (int k = 0; k < items[j].size(); k++) {
+				repr[items[j].get(k)] = i;
 			}
-		});
-
-		Integer current;
-
-		while (!queue.isEmpty()) {
-			current = queue.poll();
-			visited[current] = true;
-
-			// check break condition
-			if (current.intValue() == eventVertex_2) {
-				return true;
+			items[i].addAll(items[j]);
+			items[j].clear();
+		} else {
+			for (int k = 0; k < items[i].size(); k++) {
+				repr[items[i].get(k)] = j;
 			}
-
-			connections[current].forEach(myInt -> {
-				if (!visited[myInt]) {
-					queue.add(myInt);
-				}
-			});
+			items[j].addAll(items[i]);
+			items[i].clear();
 		}
-
-		return false;
 	}
 
 }
