@@ -20,7 +20,7 @@ public class Main {
 				sum = zero;
 				n = scanner.nextInt();
 				k = scanner.nextInt();
-				temp= BigInteger.ONE;
+				temp= BigInteger.ONE; //
 
 				//check for valid input
 				if ( (n > 0 && n < 146) && ( k >0 && k < 16)) {
