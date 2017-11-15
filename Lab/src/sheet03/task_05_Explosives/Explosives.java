@@ -1,24 +1,23 @@
 package sheet03.task_05_Explosives;
 
 import java.awt.Point;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 
 public class Explosives {
 	// union-find struktur
-	private static int[] repr;
 	private static ArrayList<Edge> edges;
-	private static ArrayList<Point> piles;
+	private static ArrayList<Pile> piles;
+	private static double totalLength = 0;
 
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 
 		while (true) {
 
+			totalLength = 0;
 			// meatadata for test case
 			int numberPiles = scanner.nextInt();
 			if (numberPiles == 0) {
@@ -26,27 +25,26 @@ public class Explosives {
 			}
 
 			edges = new ArrayList<>();
-
-			initUnionFind(numberPiles);
+			piles = new ArrayList<>();
 
 			// loop for pile, init
 			for (int j = 0; j < numberPiles; j++) {
 				int x = scanner.nextInt();
 				int y = scanner.nextInt();
 
-				Point newPoint = new Point(x, y);
+				Pile newPile = new Pile(new Point(x, y));
 
 				// edges to all existing piles
 				for (int i = 0; i < piles.size(); i++) {
-					Point otherPile = piles.get(i);
+					Pile otherPile = piles.get(i);
 
-					double length = Math.sqrt((otherPile.getX() - x) * (otherPile.getX() - x) + (otherPile.getY() - y))
-							* (otherPile.getY() - y);
-					edges.add(new Edge(length, otherPile, newPoint));
+					double length = Math.sqrt((otherPile.getX() - x) * (otherPile.getX() - x) + (otherPile.getY() - y)
+							* (otherPile.getY() - y));
+					edges.add(new Edge(length, otherPile, newPile));
 				}
 
 				// add new pile
-				piles.add(newPoint);
+				piles.add(newPile);
 			}
 
 			Collections.sort(edges, new Comparator<Edge>() {
@@ -64,77 +62,126 @@ public class Explosives {
 			});
 
 			// create mst
-			while (!allInOneComponent()) {
-				union(edges.get(0).getPoint1(), edges.get(0).getPoint2());
+			while (!allInOneComponent() && edges.size() > 0) {
+				union(edges.get(0));
+				edges.remove(0);
 			}
+			System.out.println(totalLength);
+
 		}
 		scanner.close();
 	}
 
 	private static boolean allInOneComponent() {
-		int reprOfComponent = repr[0];
+		int reprOfComponent = piles.get(0).getRep().getId();
 
 		for (int i = 1; i < piles.size(); i++) {
-			if (reprOfComponent != repr[i]) {
+			if (reprOfComponent != piles.get(i).getRep().getId()) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	private static void initUnionFind(int numberOfVertices) {
-		// union-find
-		items = new ArrayList[numberOfVertices];
-		repr = new int[numberVertices];
-		for (int n = 0; n < numberVertices; n++) {
-			items[n] = new ArrayList<>();
-			items[n].add(n);
-			repr[n] = n;
-		}
-	}
-
-	private static void union(int x, int y) {
-		int i = repr[x];
-		int j = repr[y];
-		if (i == j) {
+	private static void union(Edge edge) {
+		Pile i = edge.getPile1().getRep();
+		Pile j = edge.getPile2().getRep();
+		if (i.getId() == j.getId()) {
 			return;
 		}
-		if (items[i].size() > items[j].size()) {
-			for (int k = 0; k < items[j].size(); k++) {
-				repr[items[j].get(k)] = i;
+		if (i.getItemsOfRep().size() > j.getItemsOfRep().size()) {
+			for (int k = 0; k < j.getItemsOfRep().size(); k++) {
+				j.getItemsOfRep().get(k).setRep(i);
+				i.addItemToRep(j.getItemsOfRep().get(k));
 			}
-			items[i].addAll(items[j]);
-			items[j].clear();
+			j.clearItemsToRep();
 		} else {
-			for (int k = 0; k < items[i].size(); k++) {
-				repr[items[i].get(k)] = j;
+			for (int k = 0; k < i.getItemsOfRep().size(); k++) {
+				i.getItemsOfRep().get(k).setRep(j);
+				j.addItemToRep(i.getItemsOfRep().get(k));
 			}
-			items[j].addAll(items[i]);
-			items[i].clear();
+			i.clearItemsToRep();
 		}
+		totalLength += edge.getLength() + 16;
 	}
 
 	private static class Edge {
 		private double length;
-		private Point point1;
-		private Point point2;
+		private Pile pile1;
+		private Pile pile2;
 
-		public Edge(double length, Point point1, Point point2) {
+		public Edge(double length, Pile pile1, Pile pile2) {
 			this.length = length;
-			this.point1 = point1;
-			this.point2 = point2;
+			this.pile1 = pile1;
+			this.pile2 = pile2;
+
+//			System.out.println("new Pile: pile1: " + pile1.getId() + " pile2: " + pile2.getId() + "  length: " + length);
 		}
 
 		public double getLength() {
 			return this.length;
 		}
 
-		public Point getPoint1() {
-			return this.point1;
+		public Pile getPile1() {
+			return this.pile1;
 		}
 
-		public Point getPoint2() {
-			return this.point2;
+		public Pile getPile2() {
+			return this.pile2;
+		}
+	}
+
+	private static class Pile {
+		private Point point;
+		private int id;
+		private static int counter = 0;
+		private ArrayList<Pile> itemOfRep = new ArrayList<>();
+		private Pile rep;
+
+		public Pile(Point point) {
+			this.point = point;
+			this.id = counter;
+			this.rep = this;
+			this.itemOfRep.add(this);
+			counter++;
+
+//			System.out.println("new Pile: id: " + id + "  x: " + point.getX() + "  y: " + point.getY());
+		}
+
+		public void addItemToRep(Pile pile) {
+			this.itemOfRep.add(pile);
+		}
+
+		public void clearItemsToRep() {
+			this.itemOfRep.clear();
+		}
+
+		public ArrayList<Pile> getItemsOfRep() {
+			return this.itemOfRep;
+		}
+
+		public void setRep(Pile rep) {
+			this.rep = rep;
+		}
+
+		public Pile getRep() {
+			return this.rep;
+		}
+
+		public Point getPoint() {
+			return this.point;
+		}
+
+		public int getId() {
+			return this.id;
+		}
+
+		public double getX() {
+			return this.point.getX();
+		}
+
+		public double getY() {
+			return this.point.getY();
 		}
 	}
 }
