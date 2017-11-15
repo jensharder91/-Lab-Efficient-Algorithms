@@ -23,7 +23,7 @@ public class Main {
 				temp= BigInteger.ONE; //
 
 				//check for valid input
-				if ( (n > 0 && n < 146) && ( k > 0 && k < 16)) {
+				if ( (n > 0 && n < 146) && ( k >= 0 && k < 16)) {
         
 				  for ( int j=1;  j <= n; j++){
 					  temp=temp.multiply(BigInteger.valueOf(k));
