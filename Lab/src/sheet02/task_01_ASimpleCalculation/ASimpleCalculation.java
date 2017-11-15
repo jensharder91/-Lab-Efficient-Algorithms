@@ -1,9 +1,9 @@
-package sheet02.task_01;
+package sheet02.task_01_ASimpleCalculation;
 
 import java.math.BigInteger;
 import java.util.Scanner;
 
-public class Main {
+public class ASimpleCalculation {
 	public static void main(String[] args) {
 
 		Scanner scanner = new Scanner(System.in);
