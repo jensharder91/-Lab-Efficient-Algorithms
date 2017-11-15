@@ -47,6 +47,7 @@ public class Explosives {
 				piles.add(newPile);
 			}
 
+			//Kanten sortieren nach Länge
 			Collections.sort(edges, new Comparator<Edge>() {
 
 				@Override
@@ -66,7 +67,8 @@ public class Explosives {
 				union(edges.get(0));
 				edges.remove(0);
 			}
-			System.out.println(totalLength);
+			//2 stellen runden udn ausgeben
+			System.out.println((Math.round( totalLength * 100d ) / 100d));
 
 		}
 		scanner.close();
