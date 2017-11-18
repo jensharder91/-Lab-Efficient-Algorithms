@@ -10,10 +10,14 @@ public class Main {
 		int [] index;
 		String attributes;
 		
-		while (scanner.hasNextInt()) {
+		while (true) {
+			
 			player = scanner.nextInt();
-			if (player == 0)
+			
+			if(player == 0) {
 				break;
+			}
+			
 			int Matrix [][][] =new int [26][26][26];
 			int number=0;
 			String [][] Spieler_Attr= new String [player][6];
