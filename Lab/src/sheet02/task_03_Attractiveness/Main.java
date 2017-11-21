@@ -1,4 +1,4 @@
-package sheet02.task_03;
+package sheet02.task_03_Attractiveness;
 
 import java.util.Scanner;
 
