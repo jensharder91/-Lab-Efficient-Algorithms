@@ -1,9 +1,11 @@
 package sheet03.task_05_Explosives;
 
 import java.awt.Point;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Scanner;
 
 //6 7 21 57 30 40 103 30 64 113 86 45 118 5 10 26 83 98 141 80 87 29 94 37 3 133 74 50 87 73 112 0
@@ -49,7 +51,7 @@ public class Explosives {
 				piles.add(newPile);
 			}
 
-			// Kanten sortieren nach Länge
+			// Kanten sortieren nach Laenge
 			Collections.sort(edges, new Comparator<Edge>() {
 
 				@Override
@@ -74,7 +76,12 @@ public class Explosives {
 			}
 			// 2 stellen runden udn ausgeben
 			double roundend = (Math.round(totalLength * 100d) / 100d);
-			System.out.println(roundend);
+
+			Double numberToSave = (roundend);
+			NumberFormat nf = NumberFormat.getInstance(Locale.UK);
+			nf.setMinimumFractionDigits(2);
+			System.out.println(nf.format(numberToSave));
+
 		}
 		scanner.close();
 	}
