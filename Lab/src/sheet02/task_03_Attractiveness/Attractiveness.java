@@ -1,6 +1,5 @@
 package sheet02.task_03_Attractiveness;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -13,6 +12,7 @@ public class Attractiveness {
 
 		Scanner scanner = new Scanner(System.in);
 
+
 		while (true) {
 
 			// meatadata for test case
@@ -21,7 +21,7 @@ public class Attractiveness {
 				break;
 			}
 
-			Node root = new Node("");
+			Node root = new Node();
 			maxValue = 0;
 			maxValueCounter = 0;
 
@@ -36,30 +36,26 @@ public class Attractiveness {
 
 				// sort alphabetical
 				Arrays.sort(attributes);
+				String totalString = attributes[0]+attributes[1]+attributes[2]+attributes[3]+attributes[4]+attributes[5];
+				
+				byte[] attributeBytes = totalString.getBytes();
 
 				Node curNode = root;
 				Node foundNode = null;
 
-				// tree has 6 level, loop for each
-				for (int j = 0; j < 6; j++) {
-					ArrayList<Node> children = curNode.getChildren();
-					foundNode = null;
-					// check if limis has expected value pare "abc"
-					for (int k = 0; k < children.size(); k++) {
-						if (children.get(k).getValue().equals(attributes[j])) {
-							foundNode = children.get(k);
-							break;
-						}
-					}
+				// tree has 18 level, loop for each
+				for (int j = 0; j < 18; j++) {
+					
+					foundNode = curNode.getChild(attributeBytes[j]);
 
 					if (foundNode != null) {
 						// go to next level
 						curNode = foundNode;
 					} else {
 						// no level exists with right value... create new subtree
-						for (int k = j; k < 6; k++) {
-							Node newNode = new Node(attributes[k]);
-							curNode.addChild(newNode);
+						for (int k = j; k < 18; k++) {
+							Node newNode = new Node();
+							curNode.addChild(attributeBytes[k], newNode);
 							curNode = newNode;
 						}
 						counterLogic(curNode);
@@ -104,20 +100,17 @@ public class Attractiveness {
 	// }
 
 	private static class Node {
-		private String value;
-		private ArrayList<Node> children = new ArrayList<>();
+		private Node[] children = new Node[26];
 		private int counter = 0;
+		
+		private int offset = 97;
 
-		public Node(String value) {
-			this.value = value;
+		public Node getChild(int index) {
+			return this.children[index - offset];
 		}
 
-		public ArrayList<Node> getChildren() {
-			return this.children;
-		}
-
-		public void addChild(Node child) {
-			this.children.add(child);
+		public void addChild(int index, Node child) {
+			this.children[index-offset] = child;
 		}
 
 		public int getCounter() {
@@ -126,10 +119,6 @@ public class Attractiveness {
 
 		public void increaseCounter() {
 			this.counter++;
-		}
-
-		public String getValue() {
-			return this.value;
 		}
 	}
 }

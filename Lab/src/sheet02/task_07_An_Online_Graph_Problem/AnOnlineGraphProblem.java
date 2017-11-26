@@ -1,24 +1,20 @@
 package sheet02.task_07_An_Online_Graph_Problem;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 
 public class AnOnlineGraphProblem {
 
-	private static int counterPositive;
-	private static int counterNegative;
-	private static int numberVertices;
-
 	// union-find struktur
-	private static int[] repr;
-	private static ArrayList<Integer>[] items;
+	private static int[] parent;
+	private static int[] depth;
 
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 
 		int numberTextCases = scanner.nextInt();
+		int counterPositive;
+		int counterNegative;
+		int numberVertices;
 		int numberEvents;
 		String letter;
 
@@ -36,7 +32,12 @@ public class AnOnlineGraphProblem {
 			numberVertices = scanner.nextInt();
 			numberEvents = scanner.nextInt();
 
-			initUnionFind(numberVertices);
+			parent = new int[numberVertices];
+			depth = new int[numberVertices];
+			// each item has own itam as representant
+			for (int j = 0; j < numberVertices; j++) {
+				parent[j] = j;
+			}
 
 			// loop for every event
 			for (int j = 0; j < numberEvents; j++) {
@@ -50,7 +51,7 @@ public class AnOnlineGraphProblem {
 				if (letter.equals("q")) {
 					// if query is successful -> increase positive counter, otherwise increase
 					// negative counter
-					if (repr[eventVertex_1] == repr[eventVertex_2]) {
+					if (findRepresentant(eventVertex_1) == findRepresentant(eventVertex_2)) {
 						counterPositive++;
 					} else {
 						counterNegative++;
@@ -65,37 +66,31 @@ public class AnOnlineGraphProblem {
 		scanner.close();
 	}
 
-	@SuppressWarnings("unchecked")
-	private static void initUnionFind(int numberOfVertices) {
-		// union-find
-		items = new ArrayList[numberOfVertices];
-		repr = new int[numberVertices];
-		for (int n = 0; n < numberVertices; n++) {
-			items[n] = new ArrayList<>();
-			items[n].add(n);
-			repr[n] = n;
+	private static void union(int x, int y) {
+		int represantantX = findRepresentant(x);
+		int represantantY = findRepresentant(y);
+		if (represantantX == represantantY)
+			return;
+
+		if (depth[represantantX] < depth[represantantY])
+			parent[represantantX] = represantantY;
+		else if (depth[represantantX] > depth[represantantY])
+			parent[represantantY] = represantantX;
+		else {
+			parent[represantantY] = represantantX;
+			depth[represantantX]++;
 		}
 	}
 
-	private static void union(int x, int y) {
-		int i = repr[x];
-		int j = repr[y];
-		if (i == j) {
-			return;
+	private static int findRepresentant(int p) {
+
+		// loop until representant is found
+		while (p != parent[p]) {
+			parent[p] = parent[parent[p]];
+			p = parent[p];
 		}
-		if (items[i].size() > items[j].size()) {
-			for (int k = 0; k < items[j].size(); k++) {
-				repr[items[j].get(k)] = i;
-			}
-			items[i].addAll(items[j]);
-			items[j].clear();
-		} else {
-			for (int k = 0; k < items[i].size(); k++) {
-				repr[items[i].get(k)] = j;
-			}
-			items[j].addAll(items[i]);
-			items[i].clear();
-		}
+		return p;
+
 	}
 
 }
