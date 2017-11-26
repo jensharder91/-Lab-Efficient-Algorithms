@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 
+//6 7 21 57 30 40 103 30 64 113 86 45 118 5 10 26 83 98 141 80 87 29 94 37 3 133 74 50 87 73 112 0
+
 public class Explosives {
 	// union-find struktur
 	private static ArrayList<Edge> edges;
@@ -38,8 +40,8 @@ public class Explosives {
 				for (int i = 0; i < piles.size(); i++) {
 					Pile otherPile = piles.get(i);
 
-					double length = Math.sqrt((otherPile.getX() - x) * (otherPile.getX() - x) + (otherPile.getY() - y)
-							* (otherPile.getY() - y));
+					double length = Math.sqrt((otherPile.getX() - x) * (otherPile.getX() - x)
+							+ (otherPile.getY() - y) * (otherPile.getY() - y));
 					edges.add(new Edge(length, otherPile, newPile));
 				}
 
@@ -47,7 +49,7 @@ public class Explosives {
 				piles.add(newPile);
 			}
 
-			//Kanten sortieren nach Länge
+			// Kanten sortieren nach Länge
 			Collections.sort(edges, new Comparator<Edge>() {
 
 				@Override
@@ -62,14 +64,17 @@ public class Explosives {
 				}
 			});
 
-			// create mst
+			// create "spectial" mst
 			while (!allInOneComponent() && edges.size() > 0) {
-				union(edges.get(0));
+				Edge edge = edges.get(0);
+				if (edge.getPile1().moreEdgesok() && edge.getPile2().moreEdgesok()) {
+					union(edge);
+				}
 				edges.remove(0);
 			}
-			//2 stellen runden udn ausgeben
-			System.out.println((Math.round( totalLength * 100d ) / 100d));
-
+			// 2 stellen runden udn ausgeben
+			double roundend = (Math.round(totalLength * 100d) / 100d);
+			System.out.println(roundend);
 		}
 		scanner.close();
 	}
@@ -105,6 +110,8 @@ public class Explosives {
 			i.clearItemsToRep();
 		}
 		totalLength += edge.getLength() + 16;
+		edge.getPile1().increaseEdge();
+		edge.getPile2().increaseEdge();
 	}
 
 	private static class Edge {
@@ -117,7 +124,8 @@ public class Explosives {
 			this.pile1 = pile1;
 			this.pile2 = pile2;
 
-//			System.out.println("new Pile: pile1: " + pile1.getId() + " pile2: " + pile2.getId() + "  length: " + length);
+			// System.out.println("new Pile: pile1: " + pile1.getId() + " pile2: " +
+			// pile2.getId() + " length: " + length);
 		}
 
 		public double getLength() {
@@ -139,6 +147,7 @@ public class Explosives {
 		private static int counter = 0;
 		private ArrayList<Pile> itemOfRep = new ArrayList<>();
 		private Pile rep;
+		private int edges = 0;
 
 		public Pile(Point point) {
 			this.point = point;
@@ -147,7 +156,8 @@ public class Explosives {
 			this.itemOfRep.add(this);
 			counter++;
 
-//			System.out.println("new Pile: id: " + id + "  x: " + point.getX() + "  y: " + point.getY());
+			// System.out.println("new Pile: id: " + id + " x: " + point.getX() + " y: " +
+			// point.getY());
 		}
 
 		public void addItemToRep(Pile pile) {
@@ -184,6 +194,14 @@ public class Explosives {
 
 		public double getY() {
 			return this.point.getY();
+		}
+
+		private void increaseEdge() {
+			this.edges++;
+		}
+
+		private boolean moreEdgesok() {
+			return this.edges < 2;
 		}
 	}
 }
