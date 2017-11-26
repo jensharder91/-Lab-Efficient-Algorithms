@@ -6,7 +6,7 @@ public class AnOnlineGraphProblem {
 
 	// union-find struktur
 	private static int[] parent;
-	private static int[] depth;
+	private static byte[] depth;
 
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
@@ -33,7 +33,7 @@ public class AnOnlineGraphProblem {
 			numberEvents = scanner.nextInt();
 
 			parent = new int[numberVertices];
-			depth = new int[numberVertices];
+			depth = new byte[numberVertices];
 			// each item has own itam as representant
 			for (int j = 0; j < numberVertices; j++) {
 				parent[j] = j;
