@@ -1,32 +1,79 @@
 package sheet03.task_06_Bipartite;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Scanner;
 
-// 5 5 0 1 0 2 2 3 3 4 4 0     4 3 0 2 3 2 0 3    10 7 0 1 0 3 2 1 3 2 4 5 9 6 7 6      6 5 3 4 5 4 5 3 0 1 2 1    5 1 0 1
+/*
+5 5
+0 1
+0 2
+2 3
+3 4
+4 0
+
+4 3
+0 2
+3 2
+0 3
+
+10 7
+0 1
+0 3
+2 1
+3 2
+4 5
+9 6
+7 6
+
+6 5
+3 4
+5 4
+5 3
+0 1
+2 1
+
+5 1
+0 1
+ */
 // bipartite  ---  not bipartite  ---  bipartite  ---  not bipartite  ---  bipartite
 public class Bipartite {
 
 	// private static List<List<Integer>> edges;
 	private static Vertex[] vertices;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
-		Scanner scanner = new Scanner(System.in);
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		while (scanner.hasNext()) {
+		while (true) {
 
-			int numberVertices = scanner.nextInt();
-			int numberEdges = scanner.nextInt();
+			String input = br.readLine();
+
+			if (input == null) {
+				break;
+			}
+			
+			if(input.equals("")) {
+				continue;
+			}
+
+			String[] splitInput = input.split(" ");
+
+			int numberVertices = Integer.valueOf(splitInput[0]);
+			int numberEdges = Integer.valueOf(splitInput[1]);
 
 			vertices = new Vertex[numberVertices];
 
 			// insert all edges
 			for (int i = 0; i < numberEdges; i++) {
-				int vertex1 = scanner.nextInt();
-				int vertex2 = scanner.nextInt();
+
+				String[] edge = br.readLine().split(" ");
+				int vertex1 = Integer.valueOf(edge[0]);
+				int vertex2 = Integer.valueOf(edge[1]);
 
 				if (vertices[vertex1] == null) {
 					vertices[vertex1] = new Vertex();
@@ -46,9 +93,6 @@ public class Bipartite {
 				System.out.println("not bipartite");
 			}
 		}
-
-		scanner.close();
-
 	}
 
 	private static boolean coloredBFS(int numberVertices) {
@@ -87,9 +131,9 @@ public class Bipartite {
 			for (int j = 0; j < curNeighbors.size(); j++) {
 				Vertex curNeighbor = curNeighbors.get(j);
 				if (curNeighbor.getColor() == 0) {// not visited y -> add color and add to queue
-					curNeighbor.setColor(current.getColor() + 1);
+					curNeighbor.setColor(current.getColor() * (-1));
 					queue.add(curNeighbor);
-				} else if (curNeighbor.getColor() % 2 == current.getColor() % 2) {// visited -> check color
+				} else if (curNeighbor.getColor() == current.getColor()) {// visited -> check color
 					// same color -> return false
 					return false;
 				}
