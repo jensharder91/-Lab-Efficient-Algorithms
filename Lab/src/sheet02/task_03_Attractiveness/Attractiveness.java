@@ -1,124 +1,88 @@
 package sheet02.task_03_Attractiveness;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Scanner;
+import java.util.HashMap;
 
+/*
+3
+abc abd abe abf abg abh
+xyz xxx zxy zxy uvw wuv
+abd abe abf abg abh abc
+3
+abc def ghi jkl mno pqr
+zcd efg hij klm nop qrs
+cde fgh ijk lmn opq rst
+6
+qwe asd yxc xcv sdf wer
+qay edc rfv tgb zhn wsx
+wsx edc rfv tgb zhn qay
+qwe asd ert dfg yxc zhn
+xcv yxc asd sdf wer qwe
+qwe wer yxc xcv asd sdf
+4
+qay wsx edc rfv tgb zhn
+zhn tgb rfv edc qay wsx
+qwe qwe qwe qwe qwe qay
+qay qwe qwe qwe qwe qwe
+0
+ */
+//result 2 3 3 4
 public class Attractiveness {
 
 	private static int maxValue = 0;
 	private static int maxValueCounter = 0;
 
-	public static void main(String[] args) {
+	private static HashMap<String, Integer> hashmap;
 
-		Scanner scanner = new Scanner(System.in);
+	public static void main(String[] args) throws IOException {
 
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 		while (true) {
+		
+			String line = br.readLine();
 
 			// meatadata for test case
-			int numberPlayer = scanner.nextInt();
+			int numberPlayer = Integer.valueOf(line);
 			if (numberPlayer == 0) {
 				break;
 			}
 
-			Node root = new Node();
+			// Node root = new Node();
 			maxValue = 0;
 			maxValueCounter = 0;
+			hashmap = new HashMap<String, Integer>();
 
 			// loop for each player
 			for (int i = 0; i < numberPlayer; i++) {
 
 				// get player attribute
-				String[] attributes = new String[6];
-				for (int j = 0; j < 6; j++) {
-					attributes[j] = scanner.next();
-				}
+				String[] attributes = br.readLine().split(" ");
 
 				// sort alphabetical
 				Arrays.sort(attributes);
-				String totalString = attributes[0]+attributes[1]+attributes[2]+attributes[3]+attributes[4]+attributes[5];
-				
-				byte[] attributeBytes = totalString.getBytes();
+				String totalString = attributes[0] + attributes[1] + attributes[2] + attributes[3] + attributes[4]
+						+ attributes[5];
 
-				Node curNode = root;
-				Node foundNode = null;
-
-				// tree has 18 level, loop for each
-				for (int j = 0; j < 18; j++) {
-					
-					foundNode = curNode.getChild(attributeBytes[j]);
-
-					if (foundNode != null) {
-						// go to next level
-						curNode = foundNode;
-					} else {
-						// no level exists with right value... create new subtree
-						for (int k = j; k < 18; k++) {
-							Node newNode = new Node();
-							curNode.addChild(attributeBytes[k], newNode);
-							curNode = newNode;
-						}
-						counterLogic(curNode);
-						break;
-					}
+				Integer value = hashmap.get(totalString);
+				if (value == null) {
+					value = 0;
 				}
-				if (foundNode != null) {
-					counterLogic(foundNode);
+				value++;
+
+				hashmap.put(totalString, value);
+
+				if (value > maxValue) {
+					maxValue = value;
+					maxValueCounter = maxValue;
+				} else if (value == maxValue) {
+					maxValueCounter += value;
 				}
-				// printTree(root);
 			}
 			System.out.println(maxValueCounter);
-		}
-
-		scanner.close();
-	}
-
-	private static void counterLogic(Node node) {
-		node.increaseCounter();
-		if (node.getCounter() > maxValue) {
-			maxValue = node.getCounter();
-			maxValueCounter = maxValue;
-		} else if (node.getCounter() == maxValue) {
-			maxValueCounter += node.getCounter();
-		}
-	}
-
-	// private static void printTree(Node root, int level) {
-	// String offset = "";
-	// for (int i = 0; i < level; i++) {
-	// offset += " ";
-	// }
-	// System.out.println(offset + "value: " + root.getValue() + " counter: " +
-	// root.getCounter());
-	// for (Node child : root.getChildren()) {
-	// printTree(child, level + 1);
-	// }
-	// }
-
-	// private static void printTree(Node root) {
-	// printTree(root, 0);
-	// }
-
-	private static class Node {
-		private Node[] children = new Node[26];
-		private int counter = 0;
-		
-		private int offset = 97;
-
-		public Node getChild(int index) {
-			return this.children[index - offset];
-		}
-
-		public void addChild(int index, Node child) {
-			this.children[index-offset] = child;
-		}
-
-		public int getCounter() {
-			return this.counter;
-		}
-
-		public void increaseCounter() {
-			this.counter++;
 		}
 	}
 }
