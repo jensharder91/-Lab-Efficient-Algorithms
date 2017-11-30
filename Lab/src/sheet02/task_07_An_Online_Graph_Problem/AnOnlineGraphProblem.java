@@ -1,17 +1,32 @@
 package sheet02.task_07_An_Online_Graph_Problem;
 
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
+/*
+2
+4 6
+q 1 2
+n 1 2
+q 2 1
+n 1 3
+n 2 4
+q 3 4
+2 2
+q 1 1
+q 1 2
+ */
 public class AnOnlineGraphProblem {
 
 	// union-find struktur
 	private static int[] parent;
 	private static byte[] depth;
 
-	public static void main(String[] args) {
-		Scanner scanner = new Scanner(System.in);
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		int numberTextCases = scanner.nextInt();
+		int numberTextCases = Integer.valueOf(br.readLine());
 		int counterPositive;
 		int counterNegative;
 		int numberVertices;
@@ -29,8 +44,9 @@ public class AnOnlineGraphProblem {
 			counterNegative = 0;
 
 			// meatadata for test case
-			numberVertices = scanner.nextInt();
-			numberEvents = scanner.nextInt();
+			String[] metaData = br.readLine().split(" ");
+			numberVertices = Integer.valueOf(metaData[0]);
+			numberEvents = Integer.valueOf(metaData[1]);
 
 			parent = new int[numberVertices];
 			depth = new byte[numberVertices];
@@ -43,9 +59,10 @@ public class AnOnlineGraphProblem {
 			for (int j = 0; j < numberEvents; j++) {
 
 				// event data
-				letter = scanner.next();
-				eventVertex_1 = scanner.nextInt() - 1;
-				eventVertex_2 = scanner.nextInt() - 1;
+				String[] eventData = br.readLine().split(" ");
+				letter = eventData[0];
+				eventVertex_1 = Integer.valueOf(eventData[1]) - 1;
+				eventVertex_2 = Integer.valueOf(eventData[2]) - 1;
 
 				// distinguish event
 				if (letter.equals("q")) {
@@ -63,7 +80,6 @@ public class AnOnlineGraphProblem {
 			}
 			System.out.println(counterPositive + " " + counterNegative);
 		}
-		scanner.close();
 	}
 
 	private static void union(int x, int y) {
