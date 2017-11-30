@@ -1,98 +1,106 @@
 package sheet03.task_07_CircularProofs;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 public class CircularProofs {
 
-	// 6 2 3 2 3 5 5 4 2 3 5 3 4 2 5 4 6 3 3 2 6 1 3 5 6 5 3 2 6 1 3 5 1 3 1 4 0 0
-	// result 1 3 2 4 5 6 --- 1 5 4 2 3 --- 3 2 4 5 6 1 --- 6 1 3 2 4 5
+/*
+6 2
+3 2
+3 5
+5 4
+2 3
+5 3
+4 2
+5 4
+6 3
+3 2
+6 1
+3 5
+6 5
+3 2
+6 1
+3 5
+1 3
+1 4
+5 1
+2 3
+0 0
+*/
+// result 1 3 2 4 5 6 --- 1 5 4 2 3 --- 3 2 4 5 6 1 --- 6 1 3 2 4 5 -- 1 2 3 4 5
 
 	private static DependencyItem[] unsortedList;
-	private static int[] resultArray;
+	private static PriorityQueue<DependencyItem> priorityQueue;
 
-	public static void main(String[] args) {
-		Scanner scanner = new Scanner(System.in);
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+		// loop for each test case
 		while (true) {
-			int lemmataNumber = scanner.nextInt();
-			int dependencyNumer = scanner.nextInt();
 
-			// break condition
+			String[] metaData = br.readLine().split(" ");
+
+			int lemmataNumber = Integer.valueOf(metaData[0]);
+			int dependencyNumer = Integer.valueOf(metaData[1]);
+
+			// break condition, last testcase done.
 			if (lemmataNumber == 0 && dependencyNumer == 0) {
 				break;
 			}
 
-			resultArray = new int[lemmataNumber];
 			unsortedList = new DependencyItem[lemmataNumber];
+			priorityQueue = new PriorityQueue<>(lemmataNumber, new Comparator<DependencyItem>() {
 
-			// create for each lemma a new entry in array. double link entities
-			DependencyItem prev = null;
-			for (int j = 0; j < lemmataNumber; j++) {
-				DependencyItem now = new DependencyItem(j);
-				unsortedList[j] = now;
-				// double link entities
-				if (j > 0) {
-					prev.setNextItem(now);
-					now.setPrevItem(prev);
+				// order in prioQ
+				@Override
+				public int compare(DependencyItem o1, DependencyItem o2) {
+					return o1.getVaue() - o2.getVaue();
 				}
-				prev = now;
-			}
+			});
 
 			// insert dependencies (locks)
 			for (int j = 0; j < dependencyNumer; j++) {
-				int dependencyFrom = scanner.nextInt() - 1;
-				int dependencyTo = scanner.nextInt() - 1;
+				String[] dependency = br.readLine().split(" ");
+				int dependencyFrom = Integer.valueOf(dependency[0]) - 1;
+				int dependencyTo = Integer.valueOf(dependency[1]) - 1;
+
+				if (unsortedList[dependencyFrom] == null) {
+					unsortedList[dependencyFrom] = new DependencyItem(dependencyFrom);
+				}
+				if (unsortedList[dependencyTo] == null) {
+					unsortedList[dependencyTo] = new DependencyItem(dependencyTo);
+				}
 
 				unsortedList[dependencyFrom].addLock(unsortedList[dependencyTo]);
 			}
 
-			// loop in array and sort entities (insert in sortedArray)
-			int indexResultArray = 0;
-			DependencyItem current = unsortedList[0];
-			while (indexResultArray < resultArray.length) {
-				// is unlocked? -> use this one
-				if (current.isUnlocked()) {
-
-					// link the prev item to the next, and the next to the prev
-					// (remove the current item, because we used it)
-					DependencyItem beforeCurrent = current.getPrevItem();
-					DependencyItem afterCurrent = current.getNextItem();
-					if (beforeCurrent != null) {
-						beforeCurrent.setNextItem(afterCurrent);
-					}
-					if (afterCurrent != null) {
-						afterCurrent.setPrevItem(beforeCurrent);
-					}
-					// insert in resultArray
-					resultArray[indexResultArray] = current.getVaue() + 1;
-					indexResultArray++;
-
-					// unlock all items, depending from this one
-					DependencyItem next = current.removeAllLocks();
-					// get next item
-					if (current.getNextItem() == null) {
-						current = next;
-					} else if (next.getVaue() < current.getNextItem().getVaue()) {
-						current = next;
-					} else {
-						current = current.getNextItem();
-					}
-
-				} // else... just go to next entity
-				else {
-					current = current.getNextItem();
+			// loop and add all unlocked items to queue
+			for (int i = 0; i < unsortedList.length; i++) {
+				if (unsortedList[i] == null) {
+					unsortedList[i] = new DependencyItem(i);
+				}
+				if (unsortedList[i].isUnlocked()) {
+					priorityQueue.add(unsortedList[i]);
 				}
 			}
 
-			// print result
-			System.out.print(resultArray[0]);
-			for (int i = 1; i < resultArray.length; i++) {
-				System.out.print(" " + resultArray[i]);
+			// loop queue, unlock items (evtl add them to queue)
+			while (true) {
+				if (priorityQueue.isEmpty()) {
+					break;
+				}
+
+				DependencyItem curItem = priorityQueue.poll();
+				System.out.print((curItem.getVaue() + 1) + " ");
+				curItem.removeAllLocks();
 			}
 			System.out.print("\n");
 		}
-
-		scanner.close();
 	}
 
 	private static class DependencyItem {
@@ -100,8 +108,6 @@ public class CircularProofs {
 		private ArrayList<DependencyItem> lockedItems = new ArrayList<DependencyItem>();
 		private int lockCounter = 0;
 		private int value;
-		private DependencyItem prevItem = null;
-		private DependencyItem nextItem = null;
 
 		public DependencyItem(int value) {
 			this.value = value;
@@ -128,42 +134,20 @@ public class CircularProofs {
 			return false;
 		}
 
-		public DependencyItem removeAllLocks() {
-			DependencyItem next = nextItem;
+		public void removeAllLocks() {
 			for (int i = 0; i < this.lockedItems.size(); i++) {
 				// decrease lockCounter for each item (not locked anymore from this one)
 				boolean unlockedCompletly = this.lockedItems.get(i).decreaseLock();
-				// if it is completely unlocked -> check if this is the next item to go
+				// if it is completely unlocked -> priorityQ
 				if (unlockedCompletly) {
-					if (next == null) {
-						next = this.lockedItems.get(i);
-					} else if (this.lockedItems.get(i).getVaue() < next.getVaue()) {
-						next = this.lockedItems.get(i);
-					}
+					priorityQueue.add(this.lockedItems.get(i));
 				}
 			}
 			this.lockedItems.clear();
-			return next;
 		}
 
 		public int getVaue() {
 			return this.value;
-		}
-
-		public DependencyItem getPrevItem() {
-			return prevItem;
-		}
-
-		public void setPrevItem(DependencyItem prevItem) {
-			this.prevItem = prevItem;
-		}
-
-		public DependencyItem getNextItem() {
-			return nextItem;
-		}
-
-		public void setNextItem(DependencyItem nextItem) {
-			this.nextItem = nextItem;
 		}
 	}
 }
