@@ -63,7 +63,7 @@ public class FloatingMedian {
 		scanner.close();
 	}
 	
-	// sortiertes einfügen von a in L
+	// sortiertes einfuegen von a in L
 	static void sortedInsert(int a, ArrayList<Integer> L)
     {
         int index = Collections.binarySearch(L,a);
