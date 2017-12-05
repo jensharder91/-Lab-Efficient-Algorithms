@@ -8,80 +8,88 @@ public class MostFrequentValue {
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 
-		int n = scanner.nextInt();
-		int q = scanner.nextInt();
-
-		ArrayList<TreeObject> treeObjects = new ArrayList<>();
-		TreeObject root;
-
-		int index = 0;
-		int curNumber = Integer.MAX_VALUE;
-		int curNumberCount = 0;
-		int startedAdIndex = 0;
-
-		// read all values
-		for (int i = 0; i < n; i++) {
-
-			int input = scanner.nextInt();
-			if (input == curNumber) {
-				curNumberCount++;
+		while (true) {
+			int n = scanner.nextInt();
+			if (n == 0) {
+				break;
 			}
-			if (input != curNumber) {
-				// save old number
-				if (curNumberCount > 0) {
-					treeObjects.add(new TreeObject(curNumberCount, startedAdIndex, index));
+			int q = scanner.nextInt();
+
+			ArrayList<TreeObject> treeObjects = new ArrayList<>();
+			TreeObject root;
+
+			int index = 0;
+			int curNumber = Integer.MAX_VALUE;
+			int curNumberCount = 0;
+			int startedAdIndex = 0;
+
+			// read all values
+			for (int i = 0; i < n; i++) {
+
+				int input = scanner.nextInt();
+				if (input == curNumber) {
+					curNumberCount++;
+				}
+				if (input != curNumber) {
+					// save old number
+					if (curNumberCount > 0) {
+						treeObjects.add(new TreeObject(curNumberCount, startedAdIndex, index));
+					}
+
+					// init new number
+					curNumberCount = 1;
+					curNumber = input;
+					startedAdIndex = index + 1;
 				}
 
-				// init new number
-				curNumberCount = 1;
-				curNumber = input;
-				startedAdIndex = index + 1;
+				index++;
+			}
+			if (curNumberCount > 0) {
+				treeObjects.add(new TreeObject(curNumberCount, startedAdIndex, index));
 			}
 
-			index++;
-		}
-		if (curNumberCount > 0) {
-			treeObjects.add(new TreeObject(curNumberCount, startedAdIndex, index));
-		}
+			ArrayList<TreeObject> nextLine = new ArrayList<>();
+			ArrayList<TreeObject> curLine = treeObjects;
+			// generate tree
+			while (curLine.size() > 1) {
+				for (int i = 0; i < curLine.size(); i += 2) {
+					TreeObject first = curLine.get(i);
+					TreeObject second;
+					if (i + 1 >= curLine.size()) {
+						second = new TreeObject(0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+					} else {
+						second = curLine.get(i + 1);
+					}
 
-		ArrayList<TreeObject> nextLine = new ArrayList<>();
-		ArrayList<TreeObject> curLine = treeObjects;
-		// generate tree
-		while (curLine.size() > 1) {
-			for (int i = 0; i < curLine.size(); i += 2) {
-				TreeObject first = curLine.get(i);
-				TreeObject second;
-				if (i + 1 >= curLine.size()) {
-					second = new TreeObject(0, Integer.MAX_VALUE, Integer.MAX_VALUE);
-				} else {
-					second = curLine.get(i + 1);
+					nextLine.add(new TreeObject(Math.max(first.getMaxNumber(), second.getMaxNumber()),
+							first.getIndexFrom(), second.getIndexTo(), first, second));
 				}
-
-				nextLine.add(new TreeObject(Math.max(first.getMaxNumber(), second.getMaxNumber()), first.getIndexFrom(),
-						second.getIndexTo(), first, second));
+				curLine = nextLine;
+				nextLine = new ArrayList<>();
 			}
-			curLine = nextLine;
-			nextLine = new ArrayList<>();
-		}
-		root = curLine.get(0);
+			root = curLine.get(0);
 
-		// all queries
-		for (int i = 0; i < q; i++) {
-			int from = scanner.nextInt();
-			int to = scanner.nextInt();
+			// all queries
+			for (int i = 0; i < q; i++) {
+				int from = scanner.nextInt();
+				int to = scanner.nextInt();
 
-			int maxInner = Math.max(getInnerMaxLeft(root, from, to, 0), getInnerMaxRight(root, from, to, 0));
+				int maxInner = Math.max(getInnerMaxLeft(root, from, to, 0), getInnerMaxRight(root, from, to, 0));
 
-			TreeObject leftBoundary = getLeftBoundary(root, from);
-			TreeObject rightBoundary = getRightBoundary(root, to);
+				TreeObject leftBoundary = getLeftBoundary(root, from);
+				TreeObject rightBoundary = getRightBoundary(root, to);
 
-			int maxLeftBoundary = leftBoundary.getIndexTo() + 1 - from;
-			int maxRightBoundary = to + 1 - rightBoundary.getIndexFrom();
-			
-			//RESULT
-			int maxBoundary = Math.max(maxLeftBoundary, maxRightBoundary);
-			System.out.println(Math.max(maxBoundary, maxInner));
+				int maxLeftBoundary = leftBoundary.getIndexTo() + 1 - from;
+				int maxRightBoundary = to + 1 - rightBoundary.getIndexFrom();
 
+				int maxIntervall = to - from + 1;
+
+				// RESULT
+				int maxBoundary = Math.max(maxLeftBoundary, maxRightBoundary);
+				int maxValue = Math.max(maxBoundary, maxInner);
+				System.out.println(Math.min(maxValue, maxIntervall));
+
+			}
 		}
 
 		scanner.close();
