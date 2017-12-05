@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /*
-3
+4
 5 3.0 3.0 3.0 3.0 3.0
-5 3.0 1.0 3.0 3.0 3.0
 3 1.0 3.0 3.0 
+5 3.0 3.0 3.0 3.0 0.1
+4 3.0 3.0 3.0 3.0
  */
 public class ArrangingCircles {
 	public static void main(String[] args) throws IOException {
@@ -35,33 +36,40 @@ public class ArrangingCircles {
 			permute(radii, radii.length, allPermutations);
 
 			double minPossibleX = Integer.MAX_VALUE;
+
+			// all permuatation
 			for (int k = 0; k < allPermutations.size(); k++) {
 
-				// place first circle
-				double curCirclePointX = allPermutations.get(k)[0];
+				double[] circlePointX = new double[circles];
 
-				// place always next circle...
-				for (int j = 1; j < circles; j++) {
-					// double calcedX = Math.sqrt((radii[j - 1] + radii[j]) * (radii[j - 1] +
-					// radii[j])
-					// - (radii[j - 1] - radii[j]) * (radii[j - 1] - radii[j]));
-					double calcedX = Math.sqrt(4 * allPermutations.get(k)[j] * allPermutations.get(k)[j - 1]);
-					curCirclePointX = curCirclePointX + calcedX;
+				// place all circles step by step...
+				for (int j = 0; j < circles; j++) {
+
+					circlePointX[j] = allPermutations.get(k)[j];
+
+					// check with prev circles (to avoid overlapping)
+					for (int m = 0; m < j; m++) {
+						circlePointX[j] = Math.max(circlePointX[j],
+								circlePointX[m] + Math.sqrt(4 * allPermutations.get(k)[j] * allPermutations.get(k)[m]));
+					}
 				}
 
-				minPossibleX = Math.min(minPossibleX,
-						(Math.round((curCirclePointX + radii[circles - 1]) * 1000d) / 1000d));
+				double permuationMax = 0;
+				for (int n = 0; n < circles; n++) {
+					permuationMax = Math.max(permuationMax, circlePointX[n] + allPermutations.get(k)[n]);
+				}
+				minPossibleX = Math.min(minPossibleX, permuationMax);
 			}
 
 			// 3 Stellen runden
-
+			minPossibleX = Math.round((minPossibleX) * 1000d) / 1000d;
 			NumberFormat nf = NumberFormat.getInstance(Locale.UK);
 			nf.setMinimumFractionDigits(3);
 			System.out.println(nf.format(minPossibleX));
 
 		}
 	}
-	
+
 	static void permute(double[] radii, int n, ArrayList<double[]> permutations) {
 		double temp;
 		if (n <= 1) {
