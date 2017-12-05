@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.PriorityQueue;
 
 public class CircularProofs {
@@ -35,7 +34,7 @@ public class CircularProofs {
 // result 1 3 2 4 5 6 --- 1 5 4 2 3 --- 3 2 4 5 6 1 --- 6 1 3 2 4 5 -- 1 2 3 4 5
 
 	private static DependencyItem[] unsortedList;
-	private static PriorityQueue<DependencyItem> priorityQueue;
+	private static PriorityQueue<Integer> priorityQueue;
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -54,14 +53,7 @@ public class CircularProofs {
 			}
 
 			unsortedList = new DependencyItem[lemmataNumber];
-			priorityQueue = new PriorityQueue<>(lemmataNumber, new Comparator<DependencyItem>() {
-
-				// order in prioQ
-				@Override
-				public int compare(DependencyItem o1, DependencyItem o2) {
-					return o1.getVaue() - o2.getVaue();
-				}
-			});
+			priorityQueue = new PriorityQueue<>();
 
 			// insert dependencies (locks)
 			for (int j = 0; j < dependencyNumer; j++) {
@@ -85,7 +77,7 @@ public class CircularProofs {
 					unsortedList[i] = new DependencyItem(i);
 				}
 				if (unsortedList[i].isUnlocked()) {
-					priorityQueue.add(unsortedList[i]);
+					priorityQueue.add(unsortedList[i].value);
 				}
 			}
 
@@ -95,9 +87,9 @@ public class CircularProofs {
 					break;
 				}
 
-				DependencyItem curItem = priorityQueue.poll();
-				System.out.print((curItem.getVaue() + 1) + " ");
-				curItem.removeAllLocks();
+				int curValue = priorityQueue.poll();
+				System.out.print((curValue + 1) + " ");
+				unsortedList[curValue].removeAllLocks();
 			}
 			System.out.print("\n");
 		}
@@ -140,14 +132,10 @@ public class CircularProofs {
 				boolean unlockedCompletly = this.lockedItems.get(i).decreaseLock();
 				// if it is completely unlocked -> priorityQ
 				if (unlockedCompletly) {
-					priorityQueue.add(this.lockedItems.get(i));
+					priorityQueue.add(this.lockedItems.get(i).value);
 				}
 			}
 			this.lockedItems.clear();
-		}
-
-		public int getVaue() {
-			return this.value;
 		}
 	}
 }
