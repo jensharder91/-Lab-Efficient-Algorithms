@@ -2,6 +2,7 @@ package sheet01.task_02_PrintingStrings;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class PrintingStrings {
@@ -17,8 +18,25 @@ public class PrintingStrings {
 			permutations.clear();
 			word = scanner.next();
 
-			char[] permutation = word.toCharArray(); // Convert to array of chars
-			java.util.Arrays.sort(permutation);
+//			char[] permutation = word.toCharArray(); // Convert to array of chars
+			Character[] permutationObject = new Character[word.length()];
+			for(int i = 0; i < permutationObject.length; i++) {
+				permutationObject[i] = new Character(word.charAt(i));
+			}
+			java.util.Arrays.sort(permutationObject, new Comparator<Character>() {
+			    @Override
+			    public int compare(Character o1, Character o2) {
+			    	int lowerCaseTest = Character.toLowerCase(o1) - Character.toLowerCase(o2);
+			    	if(lowerCaseTest == 0) {
+			    		return o1-o2;
+			    	}
+			    	return lowerCaseTest;
+			    }
+			});
+			char[] permutation = new char[permutationObject.length];
+			for(int i = 0; i < permutationObject.length; i++) {
+				permutation[i] = permutationObject[i].charValue();
+			}
 			permute(permutation, permutation.length, permutations);
 			Collections.sort(permutations);
 			for (int i = 0; i < permutations.size(); i++)
