@@ -8,8 +8,8 @@ import java.util.PriorityQueue;
 
 public class CircularProofs {
 
-/*
-6 2
+	/*
+22 2
 3 2
 3 5
 5 4
@@ -55,43 +55,37 @@ public class CircularProofs {
 			unsortedList = new DependencyItem[lemmataNumber];
 			priorityQueue = new PriorityQueue<>();
 
+			// init for all lemma the dependencyItem
+			for (int i = 0; i < lemmataNumber; i++) {
+				unsortedList[i] = new DependencyItem(i);
+			}
+
 			// insert dependencies (locks)
 			for (int j = 0; j < dependencyNumer; j++) {
 				String[] dependency = br.readLine().split(" ");
 				int dependencyFrom = Integer.valueOf(dependency[0]) - 1;
 				int dependencyTo = Integer.valueOf(dependency[1]) - 1;
 
-				if (unsortedList[dependencyFrom] == null) {
-					unsortedList[dependencyFrom] = new DependencyItem(dependencyFrom);
-				}
-				if (unsortedList[dependencyTo] == null) {
-					unsortedList[dependencyTo] = new DependencyItem(dependencyTo);
-				}
-
 				unsortedList[dependencyFrom].addLock(unsortedList[dependencyTo]);
 			}
 
 			// loop and add all unlocked items to queue
 			for (int i = 0; i < unsortedList.length; i++) {
-				if (unsortedList[i] == null) {
-					unsortedList[i] = new DependencyItem(i);
-				}
 				if (unsortedList[i].isUnlocked()) {
 					priorityQueue.add(unsortedList[i].value);
 				}
 			}
 
 			// loop queue, unlock items (evtl add them to queue)
-			while (true) {
-				if (priorityQueue.isEmpty()) {
-					break;
-				}
+			StringBuffer output = new StringBuffer(lemmataNumber*2);
+			while (!priorityQueue.isEmpty()) {
 
 				int curValue = priorityQueue.poll();
-				System.out.print((curValue + 1) + " ");
+				 output.append((curValue + 1) + " ");
 				unsortedList[curValue].removeAllLocks();
 			}
-			System.out.print("\n");
+			System.out.println(output.toString());
+
 		}
 	}
 
