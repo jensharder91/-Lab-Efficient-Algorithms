@@ -41,7 +41,7 @@ public class LCS {
 		for(int i=1; i<l+1; i++){
 			for (int j=1; j<l+1; j++){
 				if (a[i-1]==b[j-1])
-					z[i][j]=z[i-1][i-1]+1;
+					z[i][j]=z[i-1][j-1]+1;
 				else if(z[i-1][j]>=z[i][j-1]) // max von z[i-1][j] und z[i][j-1]
 						z[i][j]=z[i-1][j];
 				else z[i][j]=z[i][j-1];	
