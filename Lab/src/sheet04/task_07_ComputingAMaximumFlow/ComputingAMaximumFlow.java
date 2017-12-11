@@ -3,10 +3,12 @@ package sheet04.task_07_ComputingAMaximumFlow;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -114,8 +116,11 @@ public class ComputingAMaximumFlow {
 				maxFlow += useFlow;
 			}
 
-			// print out result
-			System.out.println(maxFlow);
+			// print out rounded result			
+			double roundend = (Math.round(maxFlow * 100d) / 100d);
+			NumberFormat nf = NumberFormat.getInstance(Locale.UK);
+			nf.setMinimumFractionDigits(2);
+			System.out.println(nf.format(roundend));
 
 		}
 	}
