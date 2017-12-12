@@ -32,9 +32,6 @@ public class ComputingDistance {
 			double abstand =Double.MAX_VALUE;
 			for (int i=0; i<= NumbSegm; i++){
 				distancesToPoints[i]=distance(points[i],a);
-			// nur wenn pi_x < a_x <pi+1_x (analog fuer die y-Koordinate)
-			// ist es moeglich, dass der naechste Punkt auf der Strecke liegt
-			// ansosnten ist der naechste Punkt einer der Strecken Punkte
 				if(i==0){
 					abstand= distancesToPoints[0];
 				}
@@ -43,20 +40,18 @@ public class ComputingDistance {
 						closestPointIndex=i;
 						abstand= distancesToPoints[i];
 					}
-					if ( (points[i-1][0]<a[0] && a[0]<points[i][0]) ||
-							points[i-1][1]<a[1] && a[1]<points[i][1]) {
 					// Abstand zu Segment und naechstem Punkt
-							temp=closestPoint(points[i-1],points[i],a);
-							if(abstand >= distance(temp,a)){
-								abstand=distance(temp,a);
-								closestPointIndex=NumbSegm+1;
-								if (p[0]>temp[0])
-									p=temp;
-							}
-					}
+					temp=closestPoint(points[i-1],points[i],a);
+					// punkt ist jetzt Schnittpunkt, testen ob Teil des Segmetns	
+					if(segment(points[i-1],points[i],temp)){
+						if (abstand >= distance(temp,a)){
+							abstand =distance(temp,a);
+							closestPointIndex=NumbSegm+1;
+							if (p[0]>temp[0])
+								p=temp;
+						}
+					}							
 				}
-				
-			
 			}	
 			//Ausgabe Punkt
 			if (closestPointIndex==NumbSegm+1){
@@ -91,15 +86,34 @@ public class ComputingDistance {
 		double [] a= {(double)ai[0],(double)ai[1]};
 		double [] x= {(double)xi[0],(double)xi[1]};
 		double [] y= {(double)yi[0],(double)yi[1]};
-		double [] normVec  = {y[1]-x[1],x[0]-y[0]};
+		double [] normVec  = {x[1]-y[1],y[0]-x[0]};
 		punkt[0]= (1/((y[0]-x[0])*(-normVec[1])+(y[1]-x[1])*(normVec[0]))
 				*((a[0]*(-normVec[1])+a[1]*normVec[0])*(y[0]-x[0])
 				-(x[0]*normVec[0] + x[1]*normVec[1])*normVec[0]));
 		punkt[1]= (1/((y[0]-x[0])*(-normVec[1])+(y[1]-x[1])*(normVec[0]))
 				*((a[0]*(-normVec[1])+a[1]*normVec[0])*(y[1]-x[1])
-				-(x[0]*normVec[0] + x[1]*normVec[1])*normVec[1]));
+				-(x[0]*normVec[0] + x[1]*normVec[1])*normVec[1]));		
 		return punkt;
 	}
+	
+	static boolean segment(int []xi, int [] yi, double [] punkt ){
+		double [] x= {(double)xi[0],(double)xi[1]};
+		double [] y= {(double)yi[0],(double)yi[1]};
+		double alpha=0;
+		if(y[1]-x[1] !=0)
+			if (y[0]-x[0] !=0)
+				if ( (punkt[1]-x[1])/(y[1]-x[1]) == (punkt[0]-x[0])/(y[0]-x[0]))
+					alpha=(punkt[0]-x[0])/(y[0]-x[0]);
+				else return false;
+			else
+				alpha=(punkt[1]-x[1])/(y[1]-x[1]);
+		else
+				alpha=(punkt[0]-x[0])/(y[0]-x[0]);
+		
+		if(alpha >= 0 && alpha <=1)
+			return true;
+		else return false;
+	} 
 	
 	static void output(double[] point){
 		NumberFormat nf = NumberFormat.getInstance(Locale.UK);
