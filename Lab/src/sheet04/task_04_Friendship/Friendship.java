@@ -92,9 +92,100 @@ import java.util.Set;
 1 2 1
 4 2 1
 2 3 1
+4 2
+0 1
+2 3
+0 1 2
+2 3 3
+4 3
+0 1
+2 3
+0 1 2
+2 1 2
+1 3 3
+7 6
+0 1
+2 3
+0 4 2
+2 4 3
+4 5 1
+5 3 1
+5 6 1
+6 1 3
+7 7
+0 1
+2 3
+0 4 2
+2 4 3
+4 5 1
+5 3 1
+5 6 1
+6 1 3
+2 3 4
+7 7
+0 1
+2 3
+0 4 2
+2 4 3
+4 5 1
+5 3 1 
+5 6 1
+2 3 5 
+6 1 3 
+4 0
+0 1
+2 3
+5 3
+0 1
+2 3
+0 4 1
+1 2 1
+2 3 4
+4 4
+0 1
+2 3
+0 2 2
+2 1 3
+1 3 1
+3 0 2
+5 4
+0 1
+2 3
+0 4 2
+4 1 3
+2 4 1
+3 1 1
+10 12
+0 1
+2 3
+0 4 1 
+4 1 1
+0 7 2 
+7 1 2
+2 4 1 
+5 6 2 
+4 5 3 
+6 3 5
+2 7 3 
+7 8 6 
+8 9 1 
+9 3 1
+8 10
+0 1
+2 3
+2 4 1 
+4 5 2 
+4 7 4 
+5 6 5 
+6 3 1 
+7 6 3 
+7 1 2 
+5 1 1 
+0 5 1 
+0 7 2
 0 0
  */
-//result 7   -1     5   -1  8  -1  -1
+//result 7 # -1 # 5 # -1 # 8 # -1 # -1 # 2 # -1 # -1 # 7 # -1 # -1 #  -1 # -1 # 5 # -1 # -1
 public class Friendship {
 
 	private static Vertex[] vertices;
@@ -145,6 +236,19 @@ public class Friendship {
 				}
 				vertices[from].addEdge(new Edge(length, vertices[to]));
 			}
+			
+			if (vertices[home] == null) {
+				vertices[home] = new Vertex(home);
+			}
+			if (vertices[gym] == null) {
+				vertices[gym] = new Vertex(gym);
+			}
+			if (vertices[workplace] == null) {
+				vertices[workplace] = new Vertex(workplace);
+			}
+			if (vertices[cinema] == null) {
+				vertices[cinema] = new Vertex(cinema);
+			}
 
 			getAndRemoveAllShortestPaths();
 
@@ -156,29 +260,23 @@ public class Friendship {
 
 	private static void getAndRemoveAllShortestPaths() {
 
-		Set<Vertex> set = new HashSet<>();
-		PriorityQueue<Vertex> queue = new PriorityQueue<Vertex>(vertexNumber, new Comparator<Vertex>() {
+		PriorityQueue<Vertex> queue = new PriorityQueue<>(vertexNumber, new Comparator<Vertex>() {
 
 			@Override
 			public int compare(Vertex o1, Vertex o2) {
 				return o1.numberInPath - o2.numberInPath;
 			}
 		});
-		Vertex current;
+		Set<Vertex> set = new HashSet<>();
 
 		int shortestPath = Integer.MAX_VALUE;
 
-		set.add(vertices[workplace]);
 		queue.add(vertices[workplace]);
+		vertices[workplace].numberInPath = 0;
 
-		// // init all edges to queue
-		// for (int i = 0; i < vertices[workplace].getEdges().size(); i++) {
-		// queue.add(vertices[workplace].getEdges().get(i).getTo());
-		// }
-
-		// BFS
 		while (!queue.isEmpty()) {
-			current = queue.poll();
+			Vertex current = queue.poll();
+			set.add(current);
 
 			// check break conditions
 			if (current.numberInPath > shortestPath) {
@@ -189,17 +287,19 @@ public class Friendship {
 				continue;
 			}
 
-			for (int i = 0; i < current.getEdges().size(); i++) {
-				Vertex nextVertex = current.getEdges().get(i).getTo();
-				if (!set.contains(nextVertex)) {
-					queue.add(nextVertex);
-					set.add(nextVertex);
-					nextVertex.numberInPath = current.numberInPath + current.getEdges().get(i).getLength();
-					nextVertex.preVertexInBfs.add(current);
-				} else {
-					if (nextVertex.numberInPath == current.numberInPath + current.getEdges().get(i).getLength()) {
-						nextVertex.preVertexInBfs.add(current);
-					}
+			for (Edge edge : current.getEdges()) {
+				Vertex neighbor = edge.getTo();
+
+				if (neighbor.numberInPath > current.numberInPath + edge.getLength()) {
+					neighbor.numberInPath = current.numberInPath + edge.getLength();
+					neighbor.preVertexInBfs.clear();
+					neighbor.preVertexInBfs.add(current);
+				} else if (neighbor.numberInPath == current.numberInPath + edge.getLength()) {
+					neighbor.preVertexInBfs.add(current);
+				}
+
+				if (!set.contains(neighbor)) {
+					queue.add(neighbor);
 				}
 			}
 		}
@@ -220,65 +320,39 @@ public class Friendship {
 
 	private static int goToCinema() {
 
-		// Map<Vertex, Integer> map = new HashMap<>();
-		Set<Vertex> set = new HashSet<>();
-		PriorityQueue<Vertex> queue = new PriorityQueue<Vertex>(vertexNumber, new Comparator<Vertex>() {
+		PriorityQueue<Vertex> queue = new PriorityQueue<>(vertexNumber, new Comparator<Vertex>() {
 
 			@Override
 			public int compare(Vertex o1, Vertex o2) {
-				// TODO Auto-generated method stub
 				return o1.distanceFromHome - o2.distanceFromHome;
 			}
-
 		});
-		Vertex current;
+		Set<Vertex> set = new HashSet<>();
 
-		set.add(vertices[home]);
 		queue.add(vertices[home]);
-		// map.put(vertices[home], 0);
+		vertices[home].distanceFromHome = 0;
 
-		// // init all edges to queue
-		// for (int i = 0; i < vertices[workplace].getEdges().size(); i++) {
-		// queue.add(vertices[workplace].getEdges().get(i).getTo());
-		// map.put(vertices[workplace],
-		// }
-
-		// BFS
 		while (!queue.isEmpty()) {
-			current = queue.poll();
+			Vertex current = queue.poll();
+			set.add(current);
 
-			// check break conditions
 			if (current.getValue() == cinema) {
-				// return map.get(current);
 				return current.distanceFromHome;
 			}
 
-			for (int i = 0; i < current.getEdges().size(); i++) {
-				Vertex nextVertex = current.getEdges().get(i).getTo();
-				if (vertices[nextVertex.getValue()] != null) {
-					if (!set.contains(nextVertex)) {
-						// map.put(nextVertex, map.get(current) +
-						// current.getEdges().get(i).getLength());
-						nextVertex.distanceFromHome = current.distanceFromHome + current.getEdges().get(i).getLength();
-						queue.add(nextVertex);
-						set.add(nextVertex);
-					} else {
+			for (Edge edge : current.getEdges()) {
+				Vertex neighbor = edge.getTo();
 
-					}
+				if (neighbor.distanceFromHome > current.distanceFromHome + edge.getLength()) {
+					neighbor.distanceFromHome = current.distanceFromHome + edge.getLength();
+				}
+
+				if (!set.contains(neighbor) && vertices[neighbor.getValue()] != null) {
+					queue.add(neighbor);
 				}
 			}
 		}
 
-		// Vertex cur = vertices[cinema];
-		// int totalLength = 0;
-		// while (map.get(cur) != null) {
-		// Edge curEdge = map.get(cur);
-		// totalLength += curEdge.getLength();
-		// cur = curEdge.getFrom();
-		// }
-		// if (totalLength > 0) {
-		// return totalLength;
-		// }
 		return -1;
 	}
 
@@ -287,9 +361,9 @@ public class Friendship {
 		private int value;
 
 		// for bfs
-		int numberInPath;
+		int numberInPath = Integer.MAX_VALUE;
 		ArrayList<Vertex> preVertexInBfs = new ArrayList<>();
-		int distanceFromHome;
+		int distanceFromHome = Integer.MAX_VALUE;
 
 		public Vertex(int value) {
 			this.value = value;
