@@ -5,6 +5,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+
+/*
+2
+0
+ */// result 0
 
 /*
 2
@@ -46,8 +53,8 @@ import java.util.Iterator;
  *///result 2
 
 /*
-7
 15
+21
 1 2 
 2 3 
 3 4 
@@ -63,7 +70,13 @@ import java.util.Iterator;
 7 4 
 7 5 
 7 6
- */
+8 9
+8 10
+9 10
+9 11
+10 11
+14 15
+ */// result 3
 
 public class EdgeOrientation {
 
@@ -99,6 +112,7 @@ public class EdgeOrientation {
 		// modifiedDFS (for all graph components)
 		modifiedDFS();
 
+		Queue<Edge> queue = new LinkedList<>();
 		for (int i = 0; i < allEdges.length; i++) {
 			if (allEdges[i] != null) {
 				Node node1 = allEdges[i].getNode1();
@@ -109,13 +123,27 @@ public class EdgeOrientation {
 				} else if (node1.getDeg() < node2.getDeg()) {
 					node1.increaseDeg();
 				} else {
-					if (node1.getRemainingEdgesCount() > node2.getRemainingEdgesCount()) {
-						node2.increaseDeg();
-					} else if (node1.getRemainingEdgesCount() < node2.getRemainingEdgesCount()) {
-						node1.increaseDeg();
-					} else {
-						node1.increaseDeg();
-					}
+					queue.add(allEdges[i]);
+				}
+			}
+		}
+
+		while (!queue.isEmpty()) {
+			Edge edge = queue.poll();
+			Node node1 = edge.getNode1();
+			Node node2 = edge.getNode2();
+
+			if (node1.getDeg() > node2.getDeg()) {
+				node2.increaseDeg();
+			} else if (node1.getDeg() < node2.getDeg()) {
+				node1.increaseDeg();
+			} else {
+				if (node1.getRemainingEdgesCount() > node2.getRemainingEdgesCount()) {
+					node2.increaseDeg();
+				} else if (node1.getRemainingEdgesCount() < node2.getRemainingEdgesCount()) {
+					node1.increaseDeg();
+				} else {
+					node1.increaseDeg();
 				}
 			}
 		}
