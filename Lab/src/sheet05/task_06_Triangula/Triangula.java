@@ -3,21 +3,22 @@ package sheet05.task_06_Triangula;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-
 public class Triangula {
+	
+	static double [][] Matrix;
+	static ArrayList <Double[]> Vertices= new ArrayList<Double[]>();
 	
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 		// metadata
 		int numberVertices = Integer.valueOf(br.readLine().split(" ")[0]);
-		ArrayList <Double[]> Vertices= new ArrayList<Double[]>();
 		double length=0;
-		
+		Matrix= new double[numberVertices][numberVertices];
 
 		// alle Vertex in Liste
 		for (int i = 0; i < numberVertices; i++) {
@@ -27,13 +28,42 @@ public class Triangula {
 			Vertex[1]=Double.valueOf(point[1]);
 			Vertices.add(Vertex);	
 		}
-		length+=split(Vertices);
+		
+		// Matrix init
+//		for(int i=0; i<numberVertices; i++){
+//			for(int j=0; j<numberVertices; j++){
+//				Matrix[i][j]=0.0;
+//			}
+//		}
+		 
+		   for (int gap = 0; gap < numberVertices; gap++)
+		   {
+		      for (int i = 0, j = gap; j < numberVertices; i++, j++)
+		      {
+		          if (j < i+2)
+		             Matrix[i][j] = 0.0;
+		          else
+		          {
+		              Matrix[i][j] =Double.MAX_VALUE;
+		              for (int k = i+1; k < j; k++)
+		              {
+		                double val = Matrix[i][k] 
+		                			+ Matrix[k][j] 
+		                			+ distance(Vertices.get(i), Vertices.get(j));
+		                if (Matrix[i][j] > val)
+		                     Matrix[i][j] = val;
+		              }
+		          }
+		      }
+		   }
+		length=	Matrix[0][numberVertices-1]
+				-distance(Vertices.get(0),Vertices.get(numberVertices-1));
 		
 		//output
 		double roundend = (Math.round(length * 1000d) / 1000d);
-		NumberFormat nf = NumberFormat.getInstance(Locale.UK);
-		nf.setMinimumFractionDigits(3);
-		System.out.println(nf.format(roundend));
+		Locale.setDefault(new Locale("en"));
+		DecimalFormat df= new DecimalFormat("#############0.000");
+		System.out.println(df.format(roundend));
 		
 	}
 	
@@ -46,39 +76,23 @@ public class Triangula {
 			);
 	}
 	
-	public static double  split (ArrayList<Double[]> Points){
-		double shortest=Double.MAX_VALUE;
-		int start=0;
-		int end=Points.size()-1;
-		if (Points.size()<=3) 
-			return 0;
-		else {
-			for (int i = 0; i < Points.size(); i++) {
-				for (int j = i+2; j < Points.size(); j++) {
-					if (i==0 && j==Points.size()-1)
-						continue;
-					double temp= distance(Points.get(i),Points.get(j));
-					if (shortest>temp){
-						shortest=temp;
-						start=i;
-						end=j;
-					}
-				}		
-			}
-			if (Points.size()==4)
-				return shortest;
-			ArrayList<Double[]> Points2= new ArrayList<Double[]>();
-			Points2.addAll(Points);
-			Points2.removeAll(Points.subList(start+1, end));
-			
-			ArrayList<Double[]> Points3=new ArrayList<Double[]>();
-			Points3.addAll(Points);
-			Points3.removeAll(Points2);
-			Points3.add(0,Points.get(start));
-			Points3.add(Points.get(end));
-			
-			return shortest+split(Points3)+split(Points2);
-		}
-	}
+//	public static double  getMin (int start, int end){
+//		double temp;
+//		temp=distance(Vertices.get(start),Vertices.get(end));
+//		temp+=Matrix[start][end];
+//		temp+=Matrix[end][start];
+//		return temp;
+//	}
+//		
+//	double min(double x, double y){
+//	    return (x <= y)? x : y;
+//	}
+		 
+//	public static double cost(int i, int j, int k){
+//	    return distance(Vertices.get(i), Vertices.get(j));
+//	//    		+ distance(Vertices.get(j), Vertices.get(k))
+//	//    		+ distance(Vertices.get(k), Vertices.get(i));
+//	}
+		 
 }
 

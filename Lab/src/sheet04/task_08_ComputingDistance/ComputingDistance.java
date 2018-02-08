@@ -1,5 +1,6 @@
 package sheet04.task_08_ComputingDistance;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Scanner;
@@ -116,12 +117,12 @@ public class ComputingDistance {
 	} 
 	
 	static void output(double[] point){
-		NumberFormat nf = NumberFormat.getInstance(Locale.UK);
-		nf.setMinimumFractionDigits(2);
+		Locale.setDefault(new Locale("en"));
+		DecimalFormat df= new DecimalFormat("#############0.00");
 		point[0] = Math.round((point[0]) * 100d) / 100d;
 		point[1] = Math.round((point[1]) * 100d) / 100d;
-		System.out.println(nf.format(point[0]));
-		System.out.println(nf.format(point[1]));
+		System.out.println(df.format(point[0]));
+		System.out.println(df.format(point[1]));
 	}
 
 }
