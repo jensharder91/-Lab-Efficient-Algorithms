@@ -4,11 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class Collinearity {
 	
-	private static HashMap<String, Integer> hashmap;
+	//private static HashMap<double, Integer> hashmap;
 	static ArrayList <Double[]> Points;
 	
 	public static void main(String[] args) throws IOException  {
@@ -17,10 +18,9 @@ public class Collinearity {
 		// metadata
 		int numberPoints = Integer.valueOf(br.readLine().split(" ")[0]);
 		Points= new ArrayList<Double[]>();
-		double anzahl=0;
-		hashmap = new HashMap<String, Integer>();
-		
-		
+		int anzahl=0;
+		ArrayList<Double> lines = new ArrayList<Double>();
+			
 		// alle Punkte in Liste
 		for (int i = 0; i < numberPoints; i++) {
 			String[] Punkt= br.readLine().split(" ");
@@ -31,28 +31,29 @@ public class Collinearity {
 		}
 		
 		for (int i = 0; i < Points.size(); i++) {
+			lines.clear();
 			for (int j = i+1; j < Points.size(); j++) {
 				double[] Line= new double[2];
-				String temp;
-				Line=computeLine(i,j);
-				temp=String.valueOf(Line[0]) + " and " + String.valueOf(Line[1]);
-				
-				Integer value = hashmap.get(temp);
-				if (value == null) {
-					value = 0;
+				Line=computeLine(i,j);	
+				lines.add(Double.valueOf(Line[0]));
+			}
+			Collections.sort(lines);
+			int temp=1;
+			for(int j=0; j<lines.size()-1; j++){
+				if (Math.abs(lines.get(j)-lines.get(j+1))< 0.000000001){
+					temp++;
 				}
-				value++;
-				hashmap.put(temp, value);
-		
-				if (value>anzahl)
-					anzahl=value;
+				else{
+					temp=1;
+				}
+				if (temp >anzahl)
+					anzahl=temp;
 			}
 		}
 		
 		//output
-		anzahl= -0.5 + Math.sqrt(0.25+2*anzahl);
-		int output =1+(int)anzahl;
-		System.out.println(output);
+		anzahl++;
+		System.out.println(anzahl);
 	}
 	
 	public static double[] computeLine(int i, int j){
