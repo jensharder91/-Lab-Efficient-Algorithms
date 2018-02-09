@@ -1,15 +1,17 @@
 package sheet05.task_03_PlugItIn;
 
 import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+
+/*
+2 3 3
+1 1
+2 2
+2 3
+ */ //result 2 + 1
 
 /*
 4 5 11
@@ -59,13 +61,12 @@ public class PlugItIn {
 		numberDevices = Integer.valueOf(metdadata[1]);
 		numberEdges = Integer.valueOf(metdadata[2]);
 
-		numberNodes = numberSockets + numberDevices + 3; // +3 -> source, sink, max flow control
+		numberNodes = numberSockets + numberDevices + 2; // +2 -> source, sink
 
 		// init
 		int maxFlow = 0;
 		adjazenzmatrix = new int[numberNodes][numberNodes];
 		source = 0;
-		int maxFlowControl = numberNodes - 2;
 		sink = numberNodes - 1;
 
 		// get inputfrom edges
@@ -80,126 +81,82 @@ public class PlugItIn {
 			adjazenzmatrix[source][i] = 1;
 		}
 
-		// max flow control
+		// sink control
 		for (int i = 1; i <= numberDevices; i++) {
-			adjazenzmatrix[numberSockets + i][maxFlowControl] = 1;
+			adjazenzmatrix[numberSockets + i][sink] = 1;
 		}
+		
+		//max flow without plugbar
+		maxFlow = fordFulkerson();
 
-		// sink
-		adjazenzmatrix[maxFlowControl][sink] = numberSockets;
-
-		// Ford-Fulkerson
-		while (true) {
-			ArrayList<Integer> inversePath = getShortestPath();
-			// no path exists (anymore), quit
-			if (inversePath.size() < 1) {
-				break;
-			}
-			// System.out.println("path size: "+inversePath.size());
-			// for (int j = inversePath.size() - 1; j > 1; j--) {
-			// System.out.print(inversePath.get(j) + " ");
-			// }
-			// System.out.print("\n");
-
-			// find out how much flow this paths has INVERSE
-			int useFlow = Integer.MAX_VALUE;
-			for (int j = inversePath.size() - 1; j > 0; j--) {
-				useFlow = Math.min(useFlow, adjazenzmatrix[inversePath.get(j)][inversePath.get(j - 1)]);
-			}
-
-			// update matrix INVERSE
-			for (int j = inversePath.size() - 1; j > 0; j--) {
-				adjazenzmatrix[inversePath.get(j)][inversePath.get(j - 1)] -= useFlow;
-				adjazenzmatrix[inversePath.get(j - 1)][inversePath.get(j)] += useFlow;
-			}
-
-			// add to maxFlow
-			maxFlow += useFlow;
-		}
-
-		// check if a plug-bar is useful
-		boolean addOne = false;
-		boolean addTwo = false;
-		for (int i = 1; i <= numberSockets; i++) {
-			boolean tempAddOne = false;
-			for (int j = 1; j <= numberDevices; j++) {
-				if (adjazenzmatrix[i][numberSockets + j] == 1) {
-					if (tempAddOne) {
-						addTwo = true;
-						break;
-					}
-					addOne = true;
-					tempAddOne = true;
+		//try to apply sockets
+		for(int i = 1; i <= numberSockets; i++) {
+			for(int j = 1; j <= numberSockets; j++) {
+				if(i != j) {
+					adjazenzmatrix[source][j] = 1;
+				}else {
+					adjazenzmatrix[source][j] = 3;
 				}
 			}
-			if (addTwo) {
-				break;
-			}
+			maxFlow = maxFlow + fordFulkerson();
 		}
-
-		if (addTwo) {
-			System.out.println(maxFlow + 2);
-		} else if (addOne) {
-			// TODO complex logic to check if two are still possible
-			System.out.println(maxFlow + 1);
-		} else {
-			System.out.println(maxFlow);
-		}
+		
+		System.out.println(maxFlow);
 	}
 
-	private static ArrayList<Integer> getShortestPath() {
 
-		ArrayList<Integer> inversePath = new ArrayList<>();
+  private static boolean bfs(int parent[])  {
 
-		Map<Integer, Integer> map = new HashMap<>();
-		Set<Integer> set = new HashSet<>();
-		Queue<Integer> queue = new LinkedList<>();
-		Integer current;
+      boolean visited[] = new boolean[numberNodes];
+      for(int i=0; i<numberNodes; ++i) {
+    	  visited[i]=false;
+      }
 
-		set.add(source);
+      LinkedList<Integer> queue = new LinkedList<Integer>();
+      queue.add(source);
+      visited[source] = true;
+      parent[source]=-1;
 
-		// init all edges to queue
-		for (int i = 0; i < numberNodes; i++) {
-			if (adjazenzmatrix[source][i] > 0 && !set.contains(i)) {
-				queue.add(i);
-				set.add(i);
-				map.put(i, source);
-			}
-		}
+      while (queue.size()!=0){
+          int u = queue.poll();
 
-		// BFS
-		while (!queue.isEmpty()) {
-			current = queue.poll();
+          for (int v=0; v<numberNodes; v++){
+              if (visited[v]==false && adjazenzmatrix[u][v] > 0){
+                  queue.add(v);
+                  parent[v] = u;
+                  visited[v] = true;
+              }
+          }
+      }
+      
+      return (visited[sink] == true);
+  }
 
-			// check break condition
-			if (current.intValue() == sink) {
-				break;
-			}
+  private static int fordFulkerson(){
+	  
+      //init 
+      int parent[] = new int[numberNodes];
+      int maxFlow = 0;
 
-			for (int i = 0; i < numberNodes; i++) {
-				if (adjazenzmatrix[current][i] != 0 && !set.contains(i)) {
-					queue.add(i);
-					set.add(i);
-					map.put(i, current);
-				}
-			}
-		}
+      while (bfs(parent)){
 
-		// go through path and add to list (inverse!!)
-		Integer cur = sink;
-		inversePath.add(cur);
-		while (true) {
-			cur = map.get(cur);
-			if (cur == null) {
-				break;
-			}
-			inversePath.add(cur);
-		}
+          int tempFlow = Integer.MAX_VALUE;
+          for (int v=sink; v!=source; v=parent[v]){
+              int u = parent[v];
+              tempFlow = Math.min(tempFlow, adjazenzmatrix[u][v]);
+          }
 
-		// no complete path -> no path -> clear
-		if (inversePath.get(inversePath.size() - 1) != source) {
-			inversePath.clear();
-		}
-		return inversePath;
-	}
+          // update adjazenzmatrix
+          for (int v=sink; v != source; v=parent[v]){
+              int u = parent[v];
+              adjazenzmatrix[u][v] -= tempFlow;
+              adjazenzmatrix[v][u] += tempFlow;
+          }
+
+          // add to maxFlow
+          maxFlow += tempFlow;
+      }
+      
+      return maxFlow;
+  }
 }
