@@ -27,6 +27,7 @@ public class MinCut_1984 {
 			numberNodes = Integer.valueOf(metadata[0]);
 			// every node v is later split  into v and numberNodes+v
 			// to be able to add the edge {v,numberNodes+v} with cost of the node
+			// v is input v+numberNodes is output
 			numberEdges = Integer.valueOf(metadata[1]);
 
 			// loop testcases
@@ -34,7 +35,7 @@ public class MinCut_1984 {
 
 				// init
 				int maxFlow = 0;
-				adjazenzmatrix = new int[2*numberNodes][2*numberNodes];
+				adjazenzmatrix = new int[2*numberNodes+2][2*numberNodes+2];
 				source = 1;
 				sink = numberNodes; 
 				
@@ -53,6 +54,8 @@ public class MinCut_1984 {
 					String[] edgeInput = br.readLine().split(" ");
 
 					adjazenzmatrix[Integer.valueOf(edgeInput[0])+numberNodes][Integer.valueOf(edgeInput[1])]
+							= Integer.valueOf(edgeInput[2]);
+					adjazenzmatrix[Integer.valueOf(edgeInput[1])+numberNodes][Integer.valueOf(edgeInput[0])]
 							= Integer.valueOf(edgeInput[2]);
 				}
 
