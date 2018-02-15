@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.PriorityQueue;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 /*
 6
@@ -86,7 +87,8 @@ import java.util.Set;
 
 public class CollectingEggs {
 
-	private static ArrayList<ArrayList<Integer>> edges;
+//	private static ArrayList<ArrayList<Integer>> edges;
+	private static Node[] nodes;
 
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -97,9 +99,13 @@ public class CollectingEggs {
 			int locations = Integer.valueOf(br.readLine().split(" ")[0]);
 			int neighborships = Integer.valueOf(br.readLine().split(" ")[0]);
 
-			edges = new ArrayList<ArrayList<Integer>>();
-			for (int i = 0; i < locations; i++) {
-				edges.add(new ArrayList<Integer>());
+//			edges = new ArrayList<ArrayList<Integer>>();
+//			for (int i = 0; i < locations; i++) {
+//				edges.add(new ArrayList<Integer>());
+//			}
+			nodes = new Node[locations];
+			for(int i = 0; i < locations; i++){
+				nodes[i] = new Node();
 			}
 
 			for (int neighborship = 0; neighborship < neighborships; neighborship++) {
@@ -108,8 +114,11 @@ public class CollectingEggs {
 				int u = Integer.valueOf(newEdge[0]);
 				int v = Integer.valueOf(newEdge[1]);
 
-				edges.get(u).add(v);
-				edges.get(v).add(u);
+//				edges.get(u).add(v);
+//				edges.get(v).add(u);
+				
+				nodes[u].neighbors.add(nodes[v]);
+				nodes[v].neighbors.add(nodes[u]);
 			}
 
 			String[] metaData = br.readLine().split(" ");
@@ -117,49 +126,80 @@ public class CollectingEggs {
 			int start = Integer.valueOf(metaData[0]);
 			int end = Integer.valueOf(metaData[1]);
 
-			int[] ditances1 = dijkstra(start, locations);
-			int[] ditances2 = dijkstra(end, locations);
+			dijkstra(start, true);
+			dijkstra(end, false);
 
 			int max = 0;
 			for (int i = 0; i < locations; i++) {
-				max = Math.max(max, ditances1[i] + ditances2[i]);
+				max = Math.max(max, nodes[i].getTotalDistance());
 			}
 			System.out.println("Case " + (testCase + 1) + ": " + max);
 		}
 
 	}
 
-	private static int[] dijkstra(int startingAt, int vertexNumber) {
+	private static void dijkstra(int startingAt, boolean fromStart) {
 
-		PriorityQueue<Integer> queue = new PriorityQueue<>();
-		Set<Integer> set = new HashSet<>();
+		Queue<Node> queue = new LinkedList<>();
+		Set<Node> set = new HashSet<>();
 
-		int[] distances = new int[vertexNumber];
-		for (int i = 0; i < vertexNumber; i++) {
-			distances[i] = Integer.MAX_VALUE;
+//		int[] distances = new int[vertexNumber];
+//		for (int i = 0; i < vertexNumber; i++) {
+//			distances[i] = Integer.MAX_VALUE;
+//		}
+
+//		queue.add(startingAt);
+//		distances[startingAt] = 0;
+		queue.add(nodes[startingAt]);
+		if(fromStart) {
+			nodes[startingAt].distanceToStart = 0;
+		}else {
+			nodes[startingAt].distanceToEnd = 0;
 		}
 
-		queue.add(startingAt);
-		distances[startingAt] = 0;
-
-		Integer current;
+		Node current;
 
 		while (!queue.isEmpty()) {
 			current = queue.poll();
 			set.add(current);
 
-			for (int i = 0; i < edges.get(current).size(); i++) {
-				Integer neighbor = edges.get(current).get(i);
-
-				if (distances[neighbor] > distances[current] + 1) {
-					distances[neighbor] = distances[current] + 1;
+//			for (int i = 0; i < edges.get(current).size(); i++) {
+//				Integer neighbor = edges.get(current).get(i);
+//
+//				if (distances[neighbor] > distances[current] + 1) {
+//					distances[neighbor] = distances[current] + 1;
+//				}
+//
+//				if (!set.contains(neighbor)) {
+//					queue.add(neighbor);
+//				}
+//			}
+			
+			for(Node neighbor : current.neighbors) {
+				
+				if(fromStart) {
+					neighbor.distanceToStart = Math.min(neighbor.distanceToStart, current.distanceToStart +1);
+				}else {
+					neighbor.distanceToEnd = Math.min(neighbor.distanceToEnd, current.distanceToEnd +1);
 				}
-
-				if (!set.contains(neighbor)) {
+				
+				if(!set.contains(neighbor)) {
 					queue.add(neighbor);
 				}
 			}
 		}
-		return distances;
+//		return distances;
+	}
+	
+	
+	private static class Node{
+		
+		public ArrayList<Node> neighbors = new ArrayList<>();
+		public int distanceToStart = Integer.MAX_VALUE;
+		public int distanceToEnd = Integer.MAX_VALUE;
+		
+		public int getTotalDistance() {
+			return distanceToStart + distanceToEnd;
+		}
 	}
 }
