@@ -34,7 +34,7 @@ public class ArtOrNot {
 		}
 		
 		//guess first line
-		for (int guess=0; guess<65536; guess++ ){
+		for (int guess=0; guess<65535; guess++ ){
 			String binary = Integer.toBinaryString(guess);
 			NumberChanges=CountChanges(binary);
 			if (possible)
@@ -54,28 +54,28 @@ public class ArtOrNot {
 		int[] thisLine= new int[16];
 		int[] nextLine= new int[16];
 		int count=0;
-		char[] temp=new char[16];
-		temp=start.toCharArray();
 		
 		//set first line and count
-		for(int i=0; i<temp.length; i++){
-			if(temp[i]==1){
-				thisLine[i]=1;
-			}
+		for(int i=0; i< start.length(); i++){
+			if(start.charAt(i)==49)
+			thisLine[(15-start.length())+i+1]=1;
 		}
 		
 		for (int i=0; i<16; i++){
 			//set bits on/off on right and left
-			if(thisLine[i]==1 )
-			// Number of changes
-			count++;
+			for(int j=0; j<16; j++){
+				if(thisLine[j]==1)
+					// Number of changes
+					count++;
+			}
+			
 			for(int j=0; j<16; j++){
 				if(thisLine[j]==1){
-					nextLine[i]=XOR(nextLine[i], thisLine[i]);
-					if (i>0)
-						nextLine[i-1]=XOR(nextLine[i-1], thisLine[i]);
-					if(i<15)
-						nextLine[i+1]=XOR(nextLine[i+1], thisLine[i]);
+					nextLine[j]=XOR(nextLine[j], thisLine[j]);
+					if (j>0)
+						nextLine[j-1]=XOR(nextLine[j-1], thisLine[j]);
+					if(j<15)
+						nextLine[j+1]=XOR(nextLine[j+1], thisLine[j]);
 				}
 			}
 			for(int j=0; j<16; j++){
@@ -87,8 +87,14 @@ public class ArtOrNot {
 			}			
 			
 			// set the Lines right
-			prevLine=thisLine;
-			thisLine=nextLine;
+			for(int j=0; j<16; j++){
+				prevLine[j]=thisLine[j];
+			}
+			for(int j=0; j<16; j++){
+				thisLine[j]=nextLine[j];
+				nextLine[j]=0;
+			}
+			
 		}
 		// now this line contains all bits to change in the 17^th row which does not exist
 		possible=true;
