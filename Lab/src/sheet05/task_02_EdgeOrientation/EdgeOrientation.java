@@ -80,185 +80,206 @@ import java.util.Queue;
 
 public class EdgeOrientation {
 
-	private static Edge[] allEdges;
-	private static Node[] allNodes;
+	private static int[][] adjazenzmatrix;
+	private static int source;
+	private static int sink;
+	private static int numberNodes;
+	private static int numberEdges;
 
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		// metadata
-		int numberNode = Integer.valueOf(br.readLine().split(" ")[0]);
-		int numberEdges = Integer.valueOf(br.readLine().split(" ")[0]);
+		// get metadata
+		String[] metdadataNodes = br.readLine().split(" ");
+		numberNodes = Integer.valueOf(metdadataNodes[0]) + 2; // add source and sink
 
-		allEdges = new Edge[numberEdges];
-		allNodes = new Node[numberNode];
+		String[] metdadataEdges = br.readLine().split(" ");
+		numberEdges = Integer.valueOf(metdadataEdges[0]);
+
+		adjazenzmatrix = new int[numberNodes][numberNodes];
 
 		for (int i = 0; i < numberEdges; i++) {
 			String[] edgeInput = br.readLine().split(" ");
-
-			int node1 = Integer.valueOf(edgeInput[0]) - 1;
-			int node2 = Integer.valueOf(edgeInput[1]) - 1;
-
-			if (allNodes[node1] == null) {
-				allNodes[node1] = new Node(node1);
-			}
-			if (allNodes[node2] == null) {
-				allNodes[node2] = new Node(node2);
-			}
-
-			allEdges[i] = new Edge(i, allNodes[node1], allNodes[node2]);
+			adjazenzmatrix[Integer.valueOf(edgeInput[0])][Integer.valueOf(edgeInput[1])] = 1;
+			// adjazenzmatrix[Integer.valueOf(edgeInput[1])][Integer.valueOf(edgeInput[0])]
+			// = 1;
 		}
 
-		// modifiedDFS (for all graph components)
-		modifiedDFS();
+		source = 0;
+		sink = numberNodes - 1;
+		int maxFlow = 0;
 
-		Queue<Edge> queue = new LinkedList<>();
-		for (int i = 0; i < allEdges.length; i++) {
-			if (allEdges[i] != null) {
-				Node node1 = allEdges[i].getNode1();
-				Node node2 = allEdges[i].getNode2();
+		// // source
+		// for (int i = 1; i <= numberNodes; i++) {
+		// adjazenzmatrix[source][i] = 0;
+		// }
+		//
+		// // sink
+		// for (int i = 1; i <= numberNodes; i++) {
+		// adjazenzmatrix[numberNodes + i][sink] = 1;
+		// }
 
-				if (node1.getDeg() > node2.getDeg()) {
-					node2.increaseDeg();
-				} else if (node1.getDeg() < node2.getDeg()) {
-					node1.increaseDeg();
-				} else {
-					queue.add(allEdges[i]);
+		printGraph();
+
+		boolean increasedFlow = true;
+		int maxDegree = 0;
+
+		for (int i = 1; i <= numberNodes - 2; i++) {
+
+			adjazenzmatrix[i][sink] = 1;
+			adjazenzmatrix[source][i] = numberEdges;
+		}
+
+		System.out.println(fordFulkerson());
+		// while (increasedFlow) {
+		//
+		// System.out.println("while... next loop ");
+		//
+		// increasedFlow = false;
+		// maxDegree++;
+		// System.out.println("maxDegree = " + maxDegree);
+		//
+		// for (int i = 1; i <= numberNodes - 2; i++) {
+		//
+		// adjazenzmatrix[i][sink] = maxDegree;
+		// }
+		//
+		// int ff = fordFulkerson();
+		//
+		// if (ff > 0) {
+		// System.out.println("ff: " + ff);
+		// increasedFlow = true;
+		// }
+		//
+		// // for(int i = 1; i <= numberNodes -2 ; i++) {
+		// // if (i > 1) {
+		// // adjazenzmatrix[source][i - 1] = 0;
+		// // adjazenzmatrix[i -1 ][sink] = maxDegree;
+		// // }
+		// // adjazenzmatrix[source][i] = numberEdges;
+		// //
+		// //
+		// // adjazenzmatrix[i][sink] = 0;
+		// //
+		// // System.out.println("A");
+		// // printGraph();
+		// //
+		// // int ff = fordFulkerson();
+		// //
+		// // System.out.println("B");
+		// // printGraph();
+		// //
+		// // if(ff > 0) {
+		// // System.out.println("ff: "+ff);
+		// // increasedFlow = true;
+		// // break;
+		// // }
+		// // }
+		//
+		// }
+		//
+		// System.out.println(maxDegree - 1);
+
+	}
+
+	private static void printGraph() {
+		for (int a = 0; a < numberNodes; a++) {
+			for (int b = 0; b < numberNodes; b++) {
+				System.out.print(adjazenzmatrix[a][b] + "   ");
+			}
+			System.out.print("\n");
+		}
+
+		System.out.println();
+		System.out.println("##### #####");
+		System.out.println();
+
+	}
+
+	private static boolean bfs(int start, int parent[]) {
+
+		boolean visited[] = new boolean[numberNodes];
+		for (int i = 0; i < numberNodes; ++i) {
+			visited[i] = false;
+		}
+
+		LinkedList<Integer> queue = new LinkedList<Integer>();
+		queue.add(start);
+		visited[start] = true;
+		parent[start] = source;
+
+		while (queue.size() != 0) {
+			int u = queue.poll();
+
+			// if(visited[u]) {
+			// continue;
+			// }
+
+			for (int v = 0; v < numberNodes; v++) {
+				if (visited[v] == false && adjazenzmatrix[u][v] > 0 && v!= 0) {
+
+					 if (v != sink || parent[u] != source) {
+					queue.add(v);
+					// if(u != source) {
+					visited[v] = true;
+					parent[v] = u;
+					// }
+					 }
 				}
 			}
 		}
 
-		while (!queue.isEmpty()) {
-			Edge edge = queue.poll();
-			Node node1 = edge.getNode1();
-			Node node2 = edge.getNode2();
+		return (visited[sink] == true);
+	}
 
-			if (node1.getDeg() > node2.getDeg()) {
-				node2.increaseDeg();
-			} else if (node1.getDeg() < node2.getDeg()) {
-				node1.increaseDeg();
-			} else {
-				if (node1.getRemainingEdgesCount() > node2.getRemainingEdgesCount()) {
-					node2.increaseDeg();
-				} else if (node1.getRemainingEdgesCount() < node2.getRemainingEdgesCount()) {
-					node1.increaseDeg();
-				} else {
-					node1.increaseDeg();
+	private static int fordFulkerson() {
+
+		// init
+		int parent[] = new int[numberNodes];
+		int maxFlow = 0;
+		boolean cancel = false;
+
+		while (true) {
+			
+			System.out.println("++++++************++++++");
+			System.out.println("A");
+			printGraph();
+			
+			cancel = true;
+			for(int i = 1; i <= numberNodes -2; i++) {
+				parent = new int[numberNodes];
+				if(bfs(i, parent)) {
+					cancel = false;
+					break;
 				}
 			}
-		}
-
-		System.out.println(Node.maxDegInc);
-	}
-
-	private static void modifiedDFS() {
-		for (int i = 0; i < allNodes.length; i++) {
-			if (allNodes[i] != null && !allNodes[i].visited) {
-				DFSUtil(allNodes[i]);
+			if(cancel) {
+				System.out.println("CANCEL");
+				break;
 			}
-		}
+			
+			System.out.println("++++++");
+			System.out.println("B");
+			printGraph();
 
-	}
-
-	private static void DFSUtil(Node v) {
-		// Mark the current node as visited and print it
-		v.visited = true;
-
-		// Recur for all the vertices adjacent to this vertex
-		Iterator<Edge> i = v.getEdges().listIterator();// adj[v].listIterator();
-		while (i.hasNext()) {
-			Edge edge = i.next();
-			Node neighborNode = edge.getNeighborNode(v);
-			if (neighborNode.getDeg() == 0) {
-
-				allEdges[edge.id] = null;
-				v.increaseUsedEdge();
-				neighborNode.increaseUsedEdge();
-
-				neighborNode.increaseDeg();
-				DFSUtil(neighborNode);
+			int tempFlow = Integer.MAX_VALUE;
+			for (int v = sink; v != source; v = parent[v]) {
+				int u = parent[v];
+				tempFlow = Math.min(tempFlow, adjazenzmatrix[u][v]);
 			}
-		}
-	}
 
-	private static class Node {
-
-		private static int maxDegInc = 0;
-
-		private ArrayList<Edge> edges = new ArrayList<>();
-		private int degInc = 0;
-		private int usedEdges = 0;
-
-		int id;
-		boolean visited = false;
-
-		public Node(int id) {
-			this.id = id;
-		}
-
-		public void increaseDeg() {
-			degInc++;
-
-			if (degInc > maxDegInc) {
-				maxDegInc = degInc;
+			// update adjazenzmatrix
+			for (int v = sink; v != source; v = parent[v]) {
+				int u = parent[v];
+				adjazenzmatrix[u][v] -= tempFlow;
+				// adjazenzmatrix[v][u] += tempFlow;
+				adjazenzmatrix[v][u] = Math.max(adjazenzmatrix[v][u] += tempFlow, 1);
 			}
+
+			// add to maxFlow
+			maxFlow += tempFlow;
 		}
 
-		public void increaseUsedEdge() {
-			usedEdges++;
-		}
-
-		public int getDeg() {
-			return degInc;
-		}
-
-		public int getRemainingEdgesCount() {
-			return edges.size() + usedEdges;
-		}
-
-		public void registerEdge(Edge edge) {
-			edges.add(edge);
-		}
-
-		public ArrayList<Edge> getEdges() {
-			return edges;
-		}
-
-	}
-
-	private static class Edge {
-
-		private Node node1;
-		private Node node2;
-		int id;
-
-		public Edge(int id, Node node1, Node node2) {
-			super();
-			this.node1 = node1;
-			this.node2 = node2;
-			this.id = id;
-
-			node1.registerEdge(this);
-			node2.registerEdge(this);
-		}
-
-		public Node getNeighborNode(Node start) {
-			if (node1.id == start.id) {
-				return node2;
-			}
-			if (node2.id == start.id) {
-				return node1;
-			}
-			return null;
-		}
-
-		public Node getNode1() {
-			return node1;
-		}
-
-		public Node getNode2() {
-			return node2;
-		}
-
+		return maxFlow;
 	}
 }
