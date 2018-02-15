@@ -51,6 +51,19 @@ import java.util.LinkedList;
 5 7
  */// result 5 + 2
 
+/*
+3 6 8
+1 1
+1 2
+1 3
+2 3
+2 4
+3 4
+3 5
+3 6
+
+ */ //result 5
+
 public class PlugItIn {
 //	private static int[][] adjazenzmatrix;
 	private static int source;
@@ -109,6 +122,7 @@ public class PlugItIn {
 
 		// max flow without plugbar
 		maxFlow = fordFulkerson();
+		boolean addedOneFlow = false;
 
 		// try to apply sockets
 		for (int i = 1; i <= numberSockets; i++) {
@@ -129,7 +143,21 @@ public class PlugItIn {
 			nodes[source].edges.add(new Edge(nodes[source], nodes[i]));
 			nodes[source].edges.add(new Edge(nodes[source], nodes[i]));
 			
-			maxFlow = maxFlow + fordFulkerson();
+			int newFlow = fordFulkerson();
+			if(newFlow == 1) {
+				if(!addedOneFlow) {
+					maxFlow = maxFlow + newFlow;
+				}
+				addedOneFlow = true;
+			}
+			if(newFlow == 2) {
+				if(addedOneFlow) {
+					maxFlow = maxFlow + 1;
+				}else {
+					maxFlow = maxFlow + 2;
+				}
+				break;
+			}
 		}
 
 		System.out.println(maxFlow);
