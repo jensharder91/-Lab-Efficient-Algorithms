@@ -18,6 +18,7 @@ public class ArtOrNot {
 		int temp;
 		int [][] Null_Matrix =new int[16][16];
 		int NumberChanges=0;
+		int min=Integer.MAX_VALUE;
 		possible=false;
 		
 		for (int i=0; i<16; i++){
@@ -37,12 +38,12 @@ public class ArtOrNot {
 		for (int guess=0; guess<65535; guess++ ){
 			String binary = Integer.toBinaryString(guess);
 			NumberChanges=CountChanges(binary);
-			if (possible)
-				break;
+			if (possible && min>NumberChanges)
+				min=NumberChanges;
 		}
 		
-		if (possible)
-			System.out.println(NumberChanges);
+		if (min<Integer.MAX_VALUE)
+			System.out.println(min);
 		else
 			System.out.println("-1");
 	}
@@ -64,10 +65,12 @@ public class ArtOrNot {
 		for (int i=0; i<16; i++){
 			//set bits on/off on right and left
 			for(int j=0; j<16; j++){
+			//	System.out.print(thisLine[j]);
 				if(thisLine[j]==1)
 					// Number of changes
 					count++;
 			}
+		//	System.out.println();
 			
 			for(int j=0; j<16; j++){
 				if(thisLine[j]==1){
