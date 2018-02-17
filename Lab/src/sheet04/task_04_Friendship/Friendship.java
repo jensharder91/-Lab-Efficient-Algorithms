@@ -10,6 +10,20 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 /*
+4 3
+0 1
+2 3
+2 0 2
+0 3 1
+0 1 4
+5 2
+0 1
+2 3
+2 3 4
+1 3 2
+5 0
+0 1
+2 3
 10 5
 0 9
 1 2
@@ -185,7 +199,7 @@ import java.util.Set;
 0 7 2
 0 0
  */
-//result 7 # -1 # 5 # -1 # 8 # -1 # -1 # 2 # -1 # -1 # 7 # -1 # -1 #  -1 # -1 # 5 # -1 # -1
+//result -1 # -1 # -1 # 7 # -1 # 5 # -1 # 8 # -1 # -1 # 2 # -1 # -1 # 7 # -1 # -1 #  -1 # -1 # 5 # -1 # -1
 public class Friendship {
 
 	private static Vertex[] vertices;
@@ -252,7 +266,12 @@ public class Friendship {
 
 			getAndRemoveAllShortestPaths();
 
-			System.out.println(goToCinema());
+			//removed the home or cinema? -> not possible
+			if(vertices[home] == null || vertices[cinema] == null) {
+				System.out.println(-1);
+			}else {
+				System.out.println(goToCinema());
+			}
 
 		}
 
