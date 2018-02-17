@@ -58,7 +58,8 @@ public class RailwayNetwork {
 		Collections.sort(edges, new Comparator<Edge>() {
 			@Override
 			public int compare(Edge o1, Edge o2) {
-				return (int) (o1.length - o2.length);
+				return Double.compare(o1.length, o2.length);
+//				return (int) (o1.length - o2.length);
 			}
 		});
 
